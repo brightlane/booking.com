@@ -148,11 +148,12 @@ let totalPageCount = 0;
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-if (fs.existsSync(CITIES_PATH)) {
-  cities = JSON.parse(fs.readFileSync(CITIES_PATH, 'utf8'));
+try {
+  const txt = fs.readFileSync(CITIES_PATH, 'utf8');
+  cities = JSON.parse(txt);
   console.log(`✅ Loaded ${cities.length} cities (Stream 2).`);
-} else {
-  console.log(`⚠️  No cities‑2.json found; using dummy.`);
+} catch (err) {
+  console.log(`⚠️  Could not read ${CITIES_PATH}, using dummy cities.`);
   cities = [
     { city: "Kuala Lumpur", country: "Malaysia" },
     { city: "Langkawi", country: "Malaysia" },
