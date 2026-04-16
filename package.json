@@ -1,12 +1,16 @@
 {
-  "name": "brightlane-booking",
+  "name": "booking-com-affiliate-site",
   "version": "1.0.0",
-  "description": "Global hotel booking SEO site",
+  "description": "Auto‑generate 2000 hotel pages daily with Booking.com + Skyscanner affiliate links",
+  "main": "one-file-everything.js",
   "scripts": {
-    "build": "node generate-site-files.js"
+    "start": "node one-file-everything.js",
+    "test": "echo \"No tests yet\""
   },
-  "engines": {
-    "node": ">=20.0.0"
+  "dependencies": {
+    "fs-extra": "^11.2.0"
   },
-  "private": true
+  "devDependencies": {},
+  "author": "Benny \"Palmo Kid\" Palmarino",
+  "license": "MIT"
 }
