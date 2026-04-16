@@ -26,11 +26,3 @@ jobs:
       - name: Run one‑file generator
         run: |
           node one-file-everything.js
-
-      - name: Commit generated pages back to repo (optional)
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Actions"
-          git add output/
-          git diff --cached --quiet || git commit -m "Generated 2000 pages $(date)"
-          git push origin HEAD
