@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <meta name="google-site-verification" content="eWVDN3vbam9nnaZQu7wAQKyfmJJdM7zjI80l4DGeUrQ" />
-
-<meta name="msvalidate.01" content="574044E39556B8B8DAAF1D1F233C87B0" />
+  <meta name="msvalidate.01" content="574044E39556B8B8DAAF1D1F233C87B0" />
   <meta charset="utf-8" />
-  <title>HotelInDeals — Save Big on Hotels at Booking.com | 2026</title>
+  <title>Hotel Deals. — Save Big on Hotels at Booking.com | 2026</title>
   <meta name="description" content="Find the best hotels in, hotels near, apartments, resorts, villas, B&amp;Bs, and guesthouses worldwide in 2026. Use Booking.com to save on every stay and Skyscanner to compare flights instantly." />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="language" content="en" />
@@ -15,7 +14,7 @@
   <link rel="robots" href="https://brightlane.github.io/booking.com/robots.txt" />
 
   <!-- OpenGraph / social -->
-  <meta property="og:title" content="HotelInDeals — Save Big on Hotels at Booking.com | 2026" />
+  <meta property="og:title" content="Hotel Deals. — Save Big on Hotels at Booking.com | 2026" />
   <meta property="og:description" content="Find the best hotels in, hotels near, apartments, resorts, villas, B&amp;Bs, and guesthouses worldwide in 2026." />
   <meta property="og:url" content="https://brightlane.github.io/booking.com/" />
   <meta property="og:type" content="website" />
@@ -55,7 +54,6 @@
       top: 0;
       left: 0;
       right: 0;
-      /* headroom for navbar + search + hero */
       height: 120vh;
       z-index: 1;
     }
@@ -64,7 +62,8 @@
     .clickable-top-half input,
     .clickable-top-half select,
     .clickable-top-half label,
-    .clickable-top-half h1 {
+    .clickable-top-half h1,
+    .clickable-top-half .logo {
       z-index: 2;
       position: relative;
     }
@@ -88,6 +87,8 @@
     .logo {
       font-weight: 700;
       font-size: 1.4rem;
+      cursor: pointer;
+      display: inline-block;
     }
 
     /* Hero (Booking‑style gradient, now conversion‑focused) */
@@ -302,7 +303,7 @@
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "HotelInDeals",
+    "name": "Hotel Deals.",
     "alternateName": "Hotel Guides Worldwide",
     "url": "https://brightlane.github.io/booking.com/",
     "potentialAction": {
@@ -350,13 +351,15 @@
 </head>
 <body>
 
-<!-- Top half of the page is clickable everywhere (including headline) -->
+<!-- Top half of the page is clickable everywhere (including logo, search, hero, headline) -->
 <div class="clickable-top-half"
      onclick="window.open(pickBooking(), '_blank');">
 
   <!-- Minimal Booking‑com‑style navbar -->
   <nav class="navbar">
-    <div class="logo">HotelInDeals</div>
+    <div class="logo" onclick="window.open(pickBooking(), '_blank'); return false;">
+      Hotel Deals.
+    </div>
     <div>
       <a href="https://brightlane.github.io/booking.com/">Home</a>
       <a href="https://brightlane.github.io/booking.com/affiliates.html">Affiliates</a>
@@ -423,8 +426,12 @@
       <strong>villas</strong>, and <strong>bed and breakfasts</strong> worldwide in 2026.
     </p>
     <p>
-      <strong>Every page on HotelInDeals leads you to a Booking.com link with aid=8132800</strong>,
+      <strong>Every page on Hotel Deals. leads you to a Booking.com link with aid=8132800</strong>,
       so you always save when you book at Booking.com.
+    </p>
+    <p class="hero__price-tip">
+      <strong>Tip</strong>: Prices on Booking.com are often 10–30% cheaper than at the hotel’s own site,
+      because of their commission model and secret deals. Always book through Booking.com to save.
     </p>
     <a href="#" class="cta"
        onclick="window.open(pickBooking(), '_blank'); return false;">
@@ -442,15 +449,5 @@
       <div class="card-fancy">
         <h3>Hotels in [City]</h3>
         <p>
-          When people search for “hotel in [city]” or “hotels in [city]”, HotelInDeals generates
-          a dedicated page for that city and keyword pattern, optimized to show Booking.com’s deals.
-        </p>
-        <p>
-          Example hub cities:
-        </p>
-        <p>
-          <a href="/hotels-in-london.html" class="hub-link">Hotels in London</a> |
-          <a href="/hotels-in-paris.html" class="hub-link">Hotels in Paris</a> |
-          <a href="/hotels-in-rome.html" class="hub-link">Hotels in Rome</a> |
-          <a href="/hotels-in-tokyo.html" class="hub-link">Hotels in Tokyo</a> |
-          <a href="/hotels-in-new
+          When people search for “hotel in [city]” or “hotels in [city]”, Hotel Deals. generates
+          a dedicated page for that city
