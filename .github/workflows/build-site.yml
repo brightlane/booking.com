@@ -1,9 +1,8 @@
 name: Generate pages daemon (long‑run)
 
 on:
-  workflow_dispatch:   # Let you click "Run workflow"
+  workflow_dispatch:
   schedule:
-    # Run once per day at 2 AM UTC (change as you like)
     - cron: "0 2 * * *"
 
 jobs:
@@ -11,14 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: "--max-old-space-size=8192"
-    # Maximum run time: 360 minutes (6 hours)
     timeout-minutes: 360
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          # You must create a PERSONAL_TOKEN secret in repo Settings
-          token: ${{ secrets.PERSONAL_TOKEN }}
+      - uses: actions/checkout@v4   # ← remove "with: { token: ... }"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -35,16 +30,10 @@ jobs:
 
       - name: Run generate-pages-daemon for up to 6 hours
         run: |
-          # Start daemon
           node generate-pages-daemon.js &
           DAEMON_PID=$!
           echo "Started daemon with PID $DAEMON_PID"
-
-          # Let it run until job timeout (max 6h)
-          # You can decrease if you like, e.g., 180 minutes (3h)
           timeout 355m /bin/bash -c 'wait $DAEMON_PID || true'
-
-          # Brief cooldown
           sleep 10
 
       - name: Check how many pages generated
