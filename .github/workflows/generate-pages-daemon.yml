@@ -1,8 +1,6 @@
 name: Generate pages daemon (self‑trigger)
 
 on:
-  schedule:
-    - cron: "0 */12 * * *"
   workflow_dispatch:
   page_build:
     types: [created]
@@ -13,7 +11,7 @@ permissions:
 
 jobs:
   generate-pages-daemon:
-    name: Generate hotel pages + dynamic sitemap
+    name: Non‑stop hotel pages + dynamic sitemap daemon
     runs-on: ubuntu-latest
     timeout-minutes: 370
 
@@ -40,6 +38,7 @@ jobs:
         run: |
           node generate-pages-daemon.js &
           DAEMON_PID=$!
+          echo "Started daemon with PID $DAEMON_PID"
           timeout 355m /bin/bash -c 'wait $DAEMON_PID || true'
           sleep 10
 
