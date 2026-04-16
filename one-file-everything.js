@@ -1,5 +1,5 @@
-// 1‑file‑everything.js
-// All data + code in one file; generates 2,000 pages per run
+// one-file-everything.js
+// 100% self-contained: data + logic + template + generator
 
 const fs = require("fs-extra");
 const path = require("path");
@@ -23,9 +23,8 @@ const SKY = {
 };
 
 // ==============================
-// 2. EMBEDDED DATASET
-// (This is your "master‑all‑100‑in‑1" INSIDE this file)
-// Add as many entries as you want; keep this JSON block
+// 2. EMBEDDED DATASET (MASTER_ALL_100_IN_1)
+// Add as many entries as you want; keep this structure
 // ==============================
 
 const MASTER_DATA_ARRAY = [
@@ -202,7 +201,7 @@ function renderPage(entry) {
 }
 
 // ==============================
-// 5. GENERATOR
+// 5. GENERATOR (2000 pages per run)
 // ==============================
 
 async function generatePages() {
@@ -238,7 +237,7 @@ async function generatePages() {
 }
 
 // ==============================
-// 6. RUN THIS FILE DAILY
+// 6. RUN THIS FILE
 // ==============================
 
 generatePages().catch(console.error);
