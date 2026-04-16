@@ -1,12 +1,9 @@
 // generator-loop-2.js
-require('dotenv').config();
 
 const fs = require('fs');
 const path = require('path');
-const fetch = require('node-fetch'); // v2
 
 const OUT_DIR = path.join(__dirname, 'output-2');
-const CITIES_PATH = path.join(__dirname, 'src', 'cities-2.json');
 
 const BOOKING_AID = "8132800";
 
@@ -39,21 +36,19 @@ function pickSky() {
   return SKY.MAIN;
 }
 
-function generateContentStable(city, country, slug) {
-  const keyword = `hotels in ${city} ${country} 2026`;
+function generateDummyContent(city, country, slug) {
   return `
 <p>
-  <strong>Ultimate guide to hotels in ${city}, ${country} – 2026 Edition (Stream 2).</strong>
+  <strong>Hotels in ${city}, ${country} 2026</strong>
 </p>
 
 <p>
-  Every page on Hotel Deals. leads you to a Booking.com link with aid=${BOOKING_AID}
-  to help you save on every stay. Use this page to find the best hotels in ${city},
-  hotels near ${city}, apartments, resorts, villas, and B&amp;Bs on Booking.com.
+  Every page on Hotel Deals leads you to a Booking.com link with aid=${BOOKING_AID}.
+  Use this page to find the best hotels in ${city} on Booking.com.
 </p>
 
 <p>
-  For your flights, use Skyscanner to compare prices before you arrive.
+  For your flights, use Skyscanner to compare prices.
 </p>
 `;
 }
@@ -61,10 +56,10 @@ function generateContentStable(city, country, slug) {
 function generatePageHtml(city, country, slug) {
   const bookingUrl = pickBooking();
   const skyscannerUrl = pickSky();
-  const title = `Hotels in ${city} ${country} ${new Date().getFullYear()} | Hotel Deals (2)`;
-  const description = `Guide to hotels in ${city} ${country} in 2026 (Stream 2). Find the best Booking.com deals.`;
+  const title = `Hotels in ${city} ${country} 2026 | Hotel Deals (2)`;
+  const description = `Guide to hotels in ${city} ${country} 2026. Find the best Booking.com deals.`;
 
-  const article = generateContentStable(city, country, slug)
+  const article = generateDummyContent(city, country, slug)
     .split('\n\n')
     .map(p => `<p>${p.trim()}</p>`)
     .join('');
@@ -79,89 +74,78 @@ function generatePageHtml(city, country, slug) {
   <meta name="description" content="${description}" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://brightlane.github.io/booking.com/hotels-in-${slug}-2.html" />
-  <link rel="stylesheet" href="/styles.css" />
+  //brightlane.github.io/booking.com/hotels-in-${slug}-2.html" />
+  /styles.css" />
 </head>
 <body>
+  <div class="clickable-top-half" onclick="window.open('${bookingUrl}', '_blank');">
 
-<div class="clickable-top-half" onclick="window.open('${bookingUrl}', '_blank');">
+    <nav class="navbar">
+      <div class="logo" onclick="window.open('${bookingUrl}', '_blank'); return false;">
+          Hotel Deals. (2)
+      </div>
+      <div>
+        <a href="https://brightlane.github.io/booking.com/">Home</a>
+        <a href="https://brightlane.github.io/booking.com/affiliates.html">Affiliates</a>
+      </div>
+    </nav>
 
-  <nav class="navbar">
-    <div class="logo" onclick="window.open('${bookingUrl}', '_blank'); return false;">
-      Hotel Deals. (2)
-    </div>
-    <div>
-      <a href="https://brightlane.github.io/booking.com/">Home</a>
-      <a href="https://brightlane.github.io/booking.com/affiliates.html">Affiliates</a>
-    </div>
-  </nav>
-
-  <section class="hero">
-    <h1 onclick="window.open('${bookingUrl}', '_blank'); return false;">
-      Save Big on Hotels at Booking.com — Stream 2
-    </h1>
-    <p>
-      Every page on Hotel Deals. leads you to a Booking.com link with aid=${BOOKING_AID}.
-    </p>
-    <a href="#" class="cta"
-       onclick="window.open('${bookingUrl}', '_blank'); return false;">
-      Book on Booking.com and Save Money (aid=${BOOKING_AID}, GitHub)
-    </a>
-  </section>
-
-</div>
-
-<div class="container">
-  <article class="article-content">
-    ${article}
-  </article>
-
-  <form
-    action="https://www.booking.com/searchresults.html"
-    method="GET"
-    target="_blank"
-    style="margin:2rem 0;">
-    <input type="hidden" name="aid" value="${BOOKING_AID}" />
-    <input type="text" name="ss" value="${city}" />
-    <button type="submit">Search hotels in ${city} on Booking.com</button>
-  </form>
-
-  <div class="sky-block">
-    <p>
-      <a href="${skyscannerUrl}" target="_blank">
-        Compare flights with Skyscanner
+    <section class="hero">
+      <h1>Save Big on Hotels at Booking.com — Stream 2</h1>
+      <p>
+        Every page on Hotel Deals leads you to a Booking.com link with aid=${BOOKING_AID}.
+      </p>
+      <a href="#" class="cta"
+         onclick="window.open('${bookingUrl}', '_blank'); return false;">
+        Book on Booking.com and Save Money (aid=${BOOKING_AID}, GitHub)
       </a>
-    </p>
-  </div>
-</div>
+    </section>
 
+  </div>
+
+  <div class="container">
+    <article class="article-content">
+      ${article}
+    </article>
+
+    <form
+      action="https://www.booking.com/searchresults.html"
+      method="GET"
+      target="_blank"
+      style="margin:2rem 0;">
+      <input type="hidden" name="aid" value="${BOOKING_AID}" />
+      <input type="text" name="ss" value="${city}" />
+      <button type="submit">Search hotels in ${city} on Booking.com</button>
+    </form>
+
+    <div class="sky-block">
+      <p>
+        <a href="${skyscannerUrl}" target="_blank">
+          Compare flights with Skyscanner
+        </a>
+      </p>
+    </div>
+  </div>
 </body>
 </html>`;
 }
 
-const MAX_PAGES_PER_RUN = 500;
-const MAX_CHARS_PER_PAGE = 30_000;
+// ======== DUMMY CITIES (no need for JSON.parse or dotenv) ========
+const dummyCities = [
+  { city: "Kuala Lumpur", country: "Malaysia" },
+  { city: "Langkawi", country: "Malaysia" },
+  { city: "Riyadh", country: "Saudi Arabia" },
+  { city: "Jeddah", country: "Saudi Arabia" },
+  { city: "Singapore", country: "Singapore" },
+];
 
-let cities = [];
-let pageCounterThisRun = 0;
-let totalPageCount = 0;
+const MAX_PAGES_PER_RUN = 10;
+const MAX_CHARS_PER_PAGE = 30_000;
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-try {
-  const txt = fs.readFileSync(CITIES_PATH, 'utf8');
-  cities = JSON.parse(txt);
-  console.log(`✅ Loaded ${cities.length} cities (Stream 2).`);
-} catch (err) {
-  console.log(`⚠️  Could not read ${CITIES_PATH}, using dummy cities.`);
-  cities = [
-    { city: "Kuala Lumpur", country: "Malaysia" },
-    { city: "Langkawi", country: "Malaysia" },
-    { city: "Riyadh", country: "Saudi Arabia" },
-    { city: "Jeddah", country: "Saudi Arabia" },
-    { city: "Singapore", country: "Singapore" },
-  ];
-}
+let pageCounterThisRun = 0;
+let totalPageCount = 0;
 
 function generateSlug(city, country, id) {
   return `${country.toLowerCase()}-${city.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${id.toString().padStart(8, '0')}-2`;
@@ -172,7 +156,7 @@ function generateOnePage() {
     return false;
   }
 
-  const cityItem = cities[Math.floor(Math.random() * cities.length)];
+  const cityItem = dummyCities[Math.floor(Math.random() * dummyCities.length)];
   const { city, country } = cityItem;
   const slug = generateSlug(city, country, totalPageCount + 1);
 
@@ -183,22 +167,22 @@ function generateOnePage() {
   pageCounterThisRun += 1;
   totalPageCount += 1;
 
-  console.log(`✅ [${new Date().toISOString()}] Generated ${totalPageCount} (Stream 2): ${slug}`);
+  console.log(`✅ Generated ${totalPageCount}: ${slug}`);
   return true;
 }
 
 function loopTick() {
   const keepGoing = generateOnePage();
   if (!keepGoing) {
-    console.log(`⛔ Reached limit ${MAX_PAGES_PER_RUN} for this run (Stream 2).`);
+    console.log(`⛔ Done: ${totalPageCount} pages generated.`);
     return;
   }
 
-  const delayMs = 1_500;
+  const delayMs = 1_000;
   setTimeout(() => {
     setImmediate(loopTick);
   }, delayMs);
 }
 
-console.log(`🚀 SECOND generator started (output-2/).`);
+console.log(`🚀 Hotel Deals – Stream 2 generator started (output-2/).`);
 loopTick();
