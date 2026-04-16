@@ -1,5 +1,5 @@
 // generate-site-and-sitemap.js
-// Generates hotel pages + sitemap; every Booking.com link is one of your exact affiliate URLs
+// Correctly writes hotel pages into ./output/ + builds sitemap.xml
 
 const fs   = require("fs-extra");
 const path = require("path");
@@ -28,12 +28,13 @@ const hotels = [
   { id: "ht-1000005", city: "tokyo",      slug: "tokyo-skyline-hotel" },
 ];
 
-// Helper: build a per‑hotel page with your exact Booking.com links
+// Make sure ./output/ exists
 async function ensureOutputDir() {
   await fs.ensureDir(OUTPUT_DIR);
-  console.log("✅ Created output/ directory:", OUTPUT_DIR);
+  console.log("✅ OUTPUT_DIR:", OUTPUT_DIR);
 }
 
+// Generate one HTML page
 function generateHtml(id, city, slug) {
   const hotelLink        = `https://www.booking.com/hotel/${city}/${slug}.html?aid=8132800`;
   const apartmentsLink   = BOOKING_COM_LINKS.apartments;
@@ -49,7 +50,6 @@ function generateHtml(id, city, slug) {
   <meta charset="utf-8">
   <title>${city} - ${slug} - Booking.com Affiliate Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Tiny tracking image that hits Booking.com with your aid=8132800 on every page view -->
   <script>
     (function() {
       const img = new Image();
@@ -64,9 +64,9 @@ function generateHtml(id, city, slug) {
 
   <hr>
 
-  <h2>Booking.com category pages (your exact affiliate URLs)</h2>
+  <h2>Booking.com category pages (your exact URLs)</h2>
   <ul>
-    <li><a href="${hotelsLink}" target="_blank" rel="noopener noreferrer">Home (hotels)</a></li>
+    <li><a href="${hotelsLink}" target="_blank" rel="noopener noreferrer">Hotels homepage</a></li>
     <li><a href="${apartmentsLink}" target="_blank" rel="noopener noreferrer">Apartments</a></li>
     <li><a href="${resortsLink}" target="_blank" rel="noopener noreferrer">Resorts</a></li>
     <li><a href="${villasLink}" target="_blank" rel="noopener noreferrer">Villas</a></li>
@@ -83,13 +83,13 @@ function generateHtml(id, city, slug) {
   </p>
 
   <p style="font-size:12px;color:#888;">
-    Booking.com affiliate ID on this page: 8132800
+    Booking.com affiliate ID: 8132800
   </p>
 </body>
 </html>`;
 }
 
-// Build sitemap.xml from all generated pages + static URLs
+// Build sitemap.xml from all URLs
 async function buildSitemap(urls) {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -110,7 +110,7 @@ async function main() {
 
     const pageUrls = [];
 
-    console.log("Generating hotel pages into ./output/...");
+    console.log("Generating hotel pages into %s...", OUTPUT_DIR);
     for (const { id, city, slug } of hotels) {
       const filename = `${id}-${slug}.html`;
       const filepath = path.join(OUTPUT_DIR, filename);
