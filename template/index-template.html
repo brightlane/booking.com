@@ -1,0 +1,9 @@
+function renderIndexPage() {
+  let html = fs.readFileSync("template/index-template.html", "utf8");
+
+  // if you want to inject a dynamic title/description later, do it here
+  return html
+    .replace("HotelInDeals — 1B+ Hotel Guides, Real‑Time Deals | 2026", "HotelInDeals — 1B+ Hotel Guides, Real‑Time Deals | 2026")
+    .replace("<!-- INSERT CITY HUB LINKS -->", yourCityLinkString)
+    .replace("<!-- INSERT PATTERN HUBS -->", yourPatternLinkString);
+}
