@@ -1,14 +1,15 @@
-name: Generate pages daemon (auto‑restart)
+name: Generate pages daemon (self‑trigger)
 
 on:
-  workflow_dispatch:   # Manual trigger
-  workflow_call:       # Called by itself
+  workflow_dispatch:   # Let you manually start it once
+  workflow_call:       # Allow this workflow to be called by itself
 
 jobs:
   generate:
     runs-on: ubuntu-latest
     env:
-      NODE_OPTIONS: "--max-old-space-size=8198"
+      NODE_OPTIONS: "--max-old-space-size=8192"
+    # Maximum run time: 360 minutes (6 hours)
     timeout-minutes: 360
 
     steps:
@@ -35,7 +36,12 @@ jobs:
           timeout 355m /bin/bash -c 'wait $DAEMON_PID || true'
           sleep 10
 
-      - name: Update sitemap
+      - name: Check how many pages generated
+        run: |
+          ls -la output/ | head -20
+          echo "Total pages in output: $(ls output/*.html | wc -l) pages"
+
+      - name: Update sitemap (if you have watch-sitemap.js)
         run: |
           if [ -f watch-sitemap.js ]; then
             node watch-sitemap.js
@@ -46,12 +52,13 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add output/ sitemap.xml
-          git commit -m "Autogenerate pages + sitemap (via long‑run daemon)" || echo "No changes"
+          git commit -m "Autogenerate pages + sitemap (self‑trigger daemon)" || echo "No changes"
           git push origin main
 
-      # Re‑trigger the same workflow again (after current job finishes)
+      # Self‑trigger the same workflow again (set‑and‑forget)
       - name: Self‑trigger next run
         run: |
+          echo "Triggering next run of generate-pages-daemon.yml..."
           curl -X POST \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
