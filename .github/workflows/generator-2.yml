@@ -1,49 +1,178 @@
-name: "Hotel Deals – Auto‑Generator (Stream 2)"
+// generator-loop-2.js
+const fs = require('fs');
+const path = require('path');
 
-on:
-  schedule:
-    - cron: "0 6 * * *"   # 6:00 UTC every day
-  workflow_dispatch:
+const OUT_DIR = path.join(__dirname, 'output-2');
 
-jobs:
-  generate_pages:
-    runs-on: ubuntu-latest
-    env:
-      AI1_KEY: ${{ secrets.AI1_KEY }}
-      AI2_KEY: ${{ secrets.AI2_KEY }}
-      AI3_KEY: ${{ secrets.AI3_KEY }}
-      AI4_KEY: ${{ secrets.AI4_KEY }}
-    steps:
-      - uses: actions/checkout@v4
+const BOOKING_AID = "8132800";
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
+const BOOKING = {
+  HOME: `https://www.booking.com/index.html?aid=${BOOKING_AID}`,
+  APARTMENTS: `https://www.booking.com/apartments/index.html?aid=${BOOKING_AID}`,
+  RESORTS: `https://www.booking.com/resorts/index.html?aid=${BOOKING_AID}`,
+  VILLAS: `https://www.booking.com/villas/index.html?aid=${BOOKING_AID}`,
+  BNB: `https://www.booking.com/bed-and-breakfast/index.html?aid=${BOOKING_AID}`,
+  GUESTHOUSES: `https://www.booking.com/guest-house/index.html?aid=${BOOKING_AID}`,
+};
 
-      - name: Install dependencies
-        run: npm install node-fetch@2 dotenv --no-package-lock
+const SKY = {
+  MAIN: "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885",
+};
 
-      - name: Create src dir if needed (Stream 2)
-        run: |
-          mkdir -p src
-          cat > src/cities-2.json << 'EOF'
-[
-  { "city": "Kuala Lumpur", "country": "Malaysia" },
-  { "city": "Langkawi", "country": "Malaysia" },
-  { "city": "Riyadh", "country": "Saudi Arabia" },
-  { "city": "Jeddah", "country": "Saudi Arabia" },
-  { "city": "Singapore", "country": "Singapore" }
-]
-EOF
+function pickBooking() {
+  const options = [
+    BOOKING.HOME,
+    BOOKING.APARTMENTS,
+    BOOKING.RESORTS,
+    BOOKING.VILLAS,
+    BOOKING.BNB,
+    BOOKING.GUESTHOUSES,
+  ];
+  return options[Math.floor(Math.random() * options.length)];
+}
 
-      - name: Run second generator (set‑and‑forget loop)
-        run: node generator-loop-2.js
+function pickSky() {
+  return SKY.MAIN;
+}
 
-      - name: Commit new pages (Stream 2)
-        run: |
-          git config user.email "action@github.com"
-          git config user.name "GitHub Action"
-          git add -A .
-          git commit -m "Auto‑gen hotels (Stream 2): $(date)" || echo "No changes"
-          git push
+function generateDummyContent(city, country, slug) {
+  return `
+<p>
+  <strong>Hotels in ${city}, ${country} 2026</strong>
+</p>
+
+<p>
+  Every page on Hotel Deals leads you to a Booking.com link with aid=${BOOKING_AID}.
+  Use this page to find the best hotels in ${city} on Booking.com.
+</p>
+`;
+}
+
+function generatePageHtml(city, country, slug) {
+  const bookingUrl = pickBooking();
+  const skyscannerUrl = pickSky();
+  const title = `Hotels in ${city} ${country} 2026 | Hotel Deals (2)`;
+  const description = `Guide to hotels in ${city} ${country} 2026. Find the best Booking.com deals.`;
+
+  const article = generateDummyContent(city, country, slug)
+    .split('\n\n')
+    .map(p => `<p>${p.trim()}</p>`)
+    .join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="google-site-verification" content="eWVDN3vbam9nnaZQu7wAQKyfmJJdM7zjI80l4DGeUrQ" />
+  <meta name="msvalidate.01" content="574044E39556B8B8DAAF1D1F233C87B0" />
+  <meta charset="utf-8" />
+  <title>${title}</title>
+  <meta name="description" content="${description}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://brightlane.github.io/booking.com/hotels-in-${slug}-2.html" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="clickable-top-half" onclick="window.open('${bookingUrl}', '_blank');">
+
+    <nav class="navbar">
+      <div class="logo" onclick="window.open('${bookingUrl}', '_blank'); return false;">
+          Hotel Deals. (2)
+      </div>
+    </nav>
+
+    <section class="hero">
+      <h1>Save Big on Hotels at Booking.com — Stream 2</h1>
+      <p>
+        Every page on Hotel Deals leads you to a Booking.com link with aid=${BOOKING_AID}.
+      </p>
+      <a href="#" class="cta"
+         onclick="window.open('${bookingUrl}', '_blank'); return false;">
+        Book on Booking.com and Save Money (aid=${BOOKING_AID}, GitHub)
+      </a>
+    </section>
+
+  </div>
+
+  <div class="container">
+    <article class="article-content">
+      ${article}
+    </article>
+
+    <form
+      action="https://www.booking.com/searchresults.html"
+      method="GET"
+      target="_blank"
+      style="margin:2rem 0;">
+      <input type="hidden" name="aid" value="${BOOKING_AID}" />
+      <input type="text" name="ss" value="${city}" />
+      <button type="submit">Search hotels in ${city} on Booking.com</button>
+    </form>
+
+    <div class="sky-block">
+      <p>
+        <a href="${skyscannerUrl}" target="_blank">
+          Compare flights with Skyscanner
+        </a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+fs.mkdirSync(OUT_DIR, { recursive: true });
+
+const dummyCities = [
+  { city: "Kuala Lumpur", country: "Malaysia" },
+  { city: "Langkawi", country: "Malaysia" },
+  { city: "Riyadh", country: "Saudi Arabia" },
+  { city: "Jeddah", country: "Saudi Arabia" },
+  { city: "Singapore", country: "Singapore" },
+];
+
+const MAX_PAGES_PER_RUN = 10;      // small for testing
+const MAX_CHARS_PER_PAGE = 30_000;
+
+let pageCounterThisRun = 0;
+let totalPageCount = 0;
+
+function generateSlug(city, country, id) {
+  return `${country.toLowerCase()}-${city.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${id.toString().padStart(8, '0')}-2`;
+}
+
+function generateOnePage() {
+  if (pageCounterThisRun >= MAX_PAGES_PER_RUN) {
+    return false;
+  }
+
+  const cityItem = dummyCities[Math.floor(Math.random() * dummyCities.length)];
+  const { city, country } = cityItem;
+  const slug = generateSlug(city, country, totalPageCount + 1);
+
+  const html = generatePageHtml(city, country, slug);
+  const filepath = path.join(OUT_DIR, `hotels-in-${slug}.html`);
+  fs.writeFileSync(filepath, html, 'utf8');
+
+  pageCounterThisRun += 1;
+  totalPageCount += 1;
+
+  console.log(`✅ Generated ${totalPageCount}: ${slug}`);
+  return true;
+}
+
+function loopTick() {
+  const keepGoing = generateOnePage();
+  if (!keepGoing) {
+    console.log(`⛔ Done: ${totalPageCount} pages generated.`);
+    return;
+  }
+
+  const delayMs = 1_000;
+  setTimeout(() => {
+    setImmediate(loopTick);
+  }, delayMs);
+}
+
+console.log(`🚀 Hotel Deals – Stream 2 generator started (output-2/).`);
+loopTick();
