@@ -1,58 +1,41 @@
-name: Generate pages daemon (long‑run)
+name: Build and deploy GitHub Pages site
 
 on:
-  workflow_dispatch:   # Let you click "Run workflow"
-  schedule:
-    # Run once per day at 2 AM UTC (change as you like)
-    - cron: "0 2 * * *"
+  page_build:
+    types: [created]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
 
 jobs:
-  generate:
+  build-site:
+    name: Build and deploy site
     runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: "--max-old-space-size=8192"
-    # Maximum run time: 360 minutes (6 hours)
-    timeout-minutes: 360
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "20"
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
-          npm install fs-extra chokidar
+          npm ci
 
-      - name: Ensure output dir
+      - name: Build static site (example)
         run: |
-          mkdir -p output
+          # your build command, like:
+          echo "Build step only; no sitemap logic here"
 
-      - name: Run generate-pages-daemon for up to 6 hours
+      - name: Deploy to GitHub Pages
         run: |
-          node generate-pages-daemon.js &
-          DAEMON_PID=$!
-          echo "Started daemon with PID $DAEMON_PID"
-          timeout 355m /bin/bash -c 'wait $DAEMON_PID || true'
-          sleep 10
-
-      - name: Check how many pages generated
-        run: |
-          ls -la output/ | head -20
-          echo "Total pages in output: $(ls output/*.html | wc -l) pages"
-
-      - name: Update sitemap (if you have watch-sitemap.js)
-        run: |
-          if [ -f watch-sitemap.js ]; then
-            node watch-sitemap.js
-          fi
-
-      - name: Commit and push
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add output/ sitemap.xml
-          git commit -m "Autogenerate pages + sitemap (via long‑run daemon)" || echo "No changes"
-          git push origin main
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          npx pages-deploy --repo https://github.com/brightlane/booking.com.git --branch main --cname your-domain.com
