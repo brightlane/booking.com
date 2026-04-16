@@ -3,7 +3,7 @@ const fs = require("fs-extra");
 const path = require("path");
 
 const OUTPUT_DIR = path.resolve("./output");
-const SITEMAP_FILE = path.resolve("sitemap.xml");
+const SITEMAP_FILE = path.resolve("sitemap.xml"); // ← this must be in repo root
 
 const BASE_URL = "https://brightlane.github.io/booking.com/";
 
@@ -18,7 +18,7 @@ ${urls
 
   fs.writeFileSync(SITEMAP_FILE, xml);
   console.log(
-    `✅ sitemap.xml written with ${urls.length} URLs.`
+    `✅ sitemap.xml written with ${urls.length} URLs.`.padEnd(80, " ")
   );
 }
 
@@ -44,6 +44,9 @@ async function buildSitemap() {
       }
     }
   }
+
+  console.log("✅ URLs to output:", urls.length);
+  urls.forEach((url) => console.log(url));
 
   generateSitemapXML(urls);
 }
