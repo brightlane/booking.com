@@ -1,61 +1,39 @@
-name: Build Booking.com site
+name: Daily Generate 2000 Pages
 
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    # Run every day at 02:00 UTC (you can change this)
+    - cron: "0 2 * * *"
+  # Allow manual run from GitHub UI
   workflow_dispatch:
 
 jobs:
-  build:
+  generate-pages:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Check out the repository
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 2. Set up Node.js (v20, no cache = no warnings)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "18"
+          cache: "npm"
 
-      # 3. Verify generate-site-files.js exists BEFORE running
-      - name: Verify generate-site-files.js
+      - name: Install dependencies
         run: |
-          if [ -f "generate-site-files.js" ]; then
-            echo "✅ generate-site-files.js found in repo root."
-          else
-            echo "❌ ERROR: generate-site-files.js NOT FOUND in repo root."
-            echo "Please upload it directly to the root of the repo and push again."
-            exit 1
-          fi
+          npm install fs-extra
 
-      # 4. Run the generator: 2000+ SEO hotel pages
-      - name: Generate 2000+ hotel pages
+      - name: Run one‑file generator
         run: |
-          node generate-site-files.js
+          node one-file-everything.js
 
-      # 5. Commit and push all generated HTML files
-      - name: Commit and push changes
+      - name: Commit and push generated pages (optional)
+        # Only if you want GitHub to push the output back to the repo
         run: |
-          git config --local user.email "actions@github.com"
+          git config --local user.email "action@github.com"
           git config --local user.name "GitHub Actions"
-
-          # Add all generated .html files and the generator script
-          git add ./*.html
-          git add generate-site-files.js
-
-          # If there are changes, commit and push
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "✅ Autogenerate 2000+ SEO hotel pages from generate-site-files.js
-            - Booking.com + Skyscanner affiliate links preserved.
-            - Cross‑linked, schema‑enhanced worldwide hotel pages.
-            - Runs on every push to main."
-            git push origin main
-          else
-            echo "No changes to commit; site is already up to date."
-          fi
+          git add output/
+          git diff --cached --quiet || git commit -m "Generated 2000 pages $(date)"
+          git push origin HEAD
