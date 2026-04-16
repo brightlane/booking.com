@@ -1,0 +1,41 @@
+name: "Hotel Deals – Auto‑Generator (Stream 2)"
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # run once per day at 06:00 UTC (different from your first one)
+  workflow_dispatch:
+
+jobs:
+  generate_pages:
+    runs-on: ubuntu-latest
+    env:
+      AI1_KEY: ${{ secrets.AI1_KEY }}
+      AI2_KEY: ${{ secrets.AI2_KEY }}
+      AI3_KEY: ${{ secrets.AI3_KEY }}
+      AI4_KEY: ${{ secrets.AI4_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create src dir if needed (Stream 2)
+        run: |
+          mkdir -p src
+          echo "[] // placeholder" > src/cities-2.json
+
+      - name: Run second generator (set‑and‑forget loop)
+        run: node generator-loop-2.js
+
+      - name: Commit new pages (Stream 2)
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add -A .
+          git commit -m "Auto‑gen hotels (Stream 2): $(date)" || echo "No changes"
+          git push
