@@ -1,9 +1,7 @@
-// generator-loop-2.js
-
 const fs = require('fs');
 const path = require('path');
 
-const OUT_DIR = path.join(__dirname, 'output-2');
+const OUT_DIR = path.join(__dirname, '');
 
 const BOOKING_AID = "8132800";
 
@@ -36,19 +34,95 @@ function pickSky() {
   return SKY.MAIN;
 }
 
-function generateDummyContent(city, country, slug) {
+const dummyCities = [
+  { city: "Kuala Lumpur", country: "Malaysia" },
+  { city: "Langkawi", country: "Malaysia" },
+  { city: "Riyadh", country: "Saudi Arabia" },
+  { city: "Jeddah", country: "Saudi Arabia" },
+  { city: "Singapore", country: "Singapore" },
+  { city: "Kuching", country: "Malaysia" },
+  { city: "Penang", country: "Malaysia" },
+  { city: "Dubai", country: "United Arab Emirates" },
+  { city: "Bali", country: "Indonesia" },
+  { city: "Bangkok", country: "Thailand" },
+];
+
+const MAX_PAGES_PER_RUN = 100;
+const MAX_CHARS_PER_PAGE = 30_000;
+
+fs.mkdirSync(OUT_DIR, { recursive: true });
+
+let pageCounterThisRun = 0;
+let totalPageCount = 0;
+
+function generateSlug(city, country, id) {
+  return `${country.toLowerCase()}-${city.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${id.toString().padStart(8, '0')}-2`;
+}
+
+function generateFakeLongArticle(city, country, slug) {
+  const keyword = `hotels in ${city} ${country} 2026`;
   return `
+<h2>Where to stay in ${city}, ${country}</h2>
+
 <p>
-  <strong>Hotels in ${city}, ${country} 2026</strong>
+  Finding the best hotel in ${city} can be overwhelming, especially
+  if you're on a budget or traveling with family. In this guide,
+  we'll walk you through some of the top areas to stay in ${city}
+  and what to expect from different types of accommodations.
 </p>
+
+<h2>Popular areas in ${city}</h2>
+
+<p>
+  ${city} is a large city with many districts and neighborhoods.
+  Some of the most popular areas for tourists include:
+</p>
+
+<ul>
+  <li><strong>City Center</strong> – great for first‑time visitors who want to walk to attractions.</li>
+  <li><strong>Waterfront / Riverfront</strong> – often quieter, with nicer views and restaurants.</li>
+  <li><strong>Old Town / Historic District</strong> – ideal for culture and history lovers.</li>
+</ul>
+
+<h2>Types of hotels in ${city}</h2>
+
+<p>
+  When you search for hotels in ${city}, you’ll see several
+  different types of places. These include:
+</p>
+
+<ul>
+  <li><strong>Hotels</strong> – full‑service accommodations with front desk, housekeeping, and amenities.</li>
+  <li><strong>Apartments</strong> – great for longer stays and families who want a kitchen.</li>
+  <li><strong>Resorts</strong> – usually larger properties with pools, restaurants, and extra facilities.</li>
+  <li><strong>Villas</strong> – private houses or villas, often with pools and more space.</li>
+  <li><strong>Bed and Breakfasts (B&amp;Bs)</strong> – small, family‑run places with a cozy feel.</li>
+  <li><strong>Guesthouses</strong> – budget‑friendly options, similar to small hotels or hostels.</li>
+</ul>
+
+<h2>How to choose the best hotel in ${city}</h2>
+
+<p>
+  When booking a hotel in ${city}, consider:
+</p>
+
+<ul>
+  <li>Your budget and how long you plan to stay.</li>
+  <li>Proximity to attractions, public transport, or the airport.</li>
+  <li>Reviews and ratings from past guests.</li>
+  <li>Available amenities such as free Wi‑Fi, parking, or breakfast.</li>
+</ul>
+
+<h2>Why use Booking.com to book hotels in ${city}</h2>
 
 <p>
   Every page on Hotel Deals leads you to a Booking.com link with aid=${BOOKING_AID}.
-  Use this page to find the best hotels in ${city} on Booking.com.
+  This helps support the site and may unlock extra deals or discounts.
 </p>
 
 <p>
-  For your flights, use Skyscanner to compare prices.
+  Booking.com offers flexible cancellation options, real traveler reviews,
+  and a wide range of prices, from budget stays to luxury hotels.
 </p>
 `;
 }
@@ -59,10 +133,7 @@ function generatePageHtml(city, country, slug) {
   const title = `Hotels in ${city} ${country} 2026 | Hotel Deals (2)`;
   const description = `Guide to hotels in ${city} ${country} 2026. Find the best Booking.com deals.`;
 
-  const article = generateDummyContent(city, country, slug)
-    .split('\n\n')
-    .map(p => `<p>${p.trim()}</p>`)
-    .join('');
+  const article = generateFakeLongArticle(city, country, slug);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -74,81 +145,65 @@ function generatePageHtml(city, country, slug) {
   <meta name="description" content="${description}" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="index, follow" />
-  //brightlane.github.io/booking.com/hotels-in-${slug}-2.html" />
-  /styles.css" />
+  <link rel="canonical" href="https://brightlane.github.io/booking.com/hotels-in-${slug}.html" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="clickable-top-half" onclick="window.open('${bookingUrl}', '_blank');">
 
-    <nav class="navbar">
-      <div class="logo" onclick="window.open('${bookingUrl}', '_blank'); return false;">
-          Hotel Deals. (2)
-      </div>
-      <div>
-        <a href="https://brightlane.github.io/booking.com/">Home</a>
-        <a href="https://brightlane.github.io/booking.com/affiliates.html">Affiliates</a>
-      </div>
-    </nav>
+<div class="clickable-top-half" onclick="window.open('${bookingUrl}', '_blank');">
 
-    <section class="hero">
-      <h1>Save Big on Hotels at Booking.com — Stream 2</h1>
-      <p>
-        Every page on Hotel Deals leads you to a Booking.com link with aid=${BOOKING_AID}.
-      </p>
-      <a href="#" class="cta"
-         onclick="window.open('${bookingUrl}', '_blank'); return false;">
-        Book on Booking.com and Save Money (aid=${BOOKING_AID}, GitHub)
-      </a>
-    </section>
-
-  </div>
-
-  <div class="container">
-    <article class="article-content">
-      ${article}
-    </article>
-
-    <form
-      action="https://www.booking.com/searchresults.html"
-      method="GET"
-      target="_blank"
-      style="margin:2rem 0;">
-      <input type="hidden" name="aid" value="${BOOKING_AID}" />
-      <input type="text" name="ss" value="${city}" />
-      <button type="submit">Search hotels in ${city} on Booking.com</button>
-    </form>
-
-    <div class="sky-block">
-      <p>
-        <a href="${skyscannerUrl}" target="_blank">
-          Compare flights with Skyscanner
-        </a>
-      </p>
+  <nav class="navbar">
+    <div class="logo" onclick="window.open('${bookingUrl}', '_blank'); return false;">
+      Hotel Deals. (2)
     </div>
+    <div>
+      <a href="https://brightlane.github.io/booking.com/">Home</a>
+      <a href="https://brightlane.github.io/booking.com/affiliates.html">Affiliates</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1 onclick="window.open('${bookingUrl}', '_blank'); return false;">
+      Save Big on Hotels at Booking.com — Stream 2
+    </h1>
+    <p>
+      Every page on Hotel Deals leads you to a Booking.com link with aid=${BOOKING_AID}.
+    </p>
+    <a href="#" class="cta"
+       onclick="window.open('${bookingUrl}', '_blank'); return false;">
+      Book on Booking.com and Save Money (aid=${BOOKING_AID}, GitHub)
+    </a>
+  </section>
+
+</div>
+
+<div class="container">
+  <article class="article-content">
+    <h1>Hotels in ${city}, ${country} 2026</h1>
+    ${article}
+  </article>
+
+  <form
+    action="https://www.booking.com/searchresults.html"
+    method="GET"
+    target="_blank"
+    style="margin:2rem 0;">
+    <input type="hidden" name="aid" value="${BOOKING_AID}" />
+    <input type="text" name="ss" value="${city}" />
+    <button type="submit" style="padding:0.6rem 1.2rem;font-size:1rem;">Search hotels in ${city} on Booking.com</button>
+  </form>
+
+  <div class="sky-block">
+    <p>
+      <a href="${skyscannerUrl}" target="_blank">
+        Compare flights with Skyscanner
+      </a>
+    </p>
   </div>
+</div>
+
 </body>
 </html>`;
-}
-
-// ======== DUMMY CITIES (no need for JSON.parse or dotenv) ========
-const dummyCities = [
-  { city: "Kuala Lumpur", country: "Malaysia" },
-  { city: "Langkawi", country: "Malaysia" },
-  { city: "Riyadh", country: "Saudi Arabia" },
-  { city: "Jeddah", country: "Saudi Arabia" },
-  { city: "Singapore", country: "Singapore" },
-];
-
-const MAX_PAGES_PER_RUN = 10;
-const MAX_CHARS_PER_PAGE = 30_000;
-
-fs.mkdirSync(OUT_DIR, { recursive: true });
-
-let pageCounterThisRun = 0;
-let totalPageCount = 0;
-
-function generateSlug(city, country, id) {
-  return `${country.toLowerCase()}-${city.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${id.toString().padStart(8, '0')}-2`;
 }
 
 function generateOnePage() {
@@ -184,5 +239,5 @@ function loopTick() {
   }, delayMs);
 }
 
-console.log(`🚀 Hotel Deals – Stream 2 generator started (output-2/).`);
+console.log(`🚀 Hotel Deals – Stream 2 generator started (pages at /booking.com/hotels-in-*.html).`);
 loopTick();
