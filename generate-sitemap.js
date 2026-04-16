@@ -3,7 +3,7 @@ const fs = require("fs-extra");
 const path = require("path");
 
 const OUTPUT_DIR = path.resolve("./output");
-const SITEMAP_FILE = path.resolve("sitemap.xml"); // root, where GitHub Pages serves it
+const SITEMAP_FILE = path.resolve("sitemap.xml");
 
 const BASE_URL = "https://brightlane.github.io/booking.com/";
 
