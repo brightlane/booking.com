@@ -2,7 +2,7 @@ name: "Hotel Deals – Auto‑Generator (Stream 2)"
 
 on:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 6 * * *"   # 6:00 UTC every day
   workflow_dispatch:
 
 jobs:
@@ -22,12 +22,20 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
-        run: npm install
+        run: npm install node-fetch@2 dotenv --no-package-lock
 
       - name: Create src dir if needed (Stream 2)
         run: |
           mkdir -p src
-          echo "[] // placeholder" > src/cities-2.json
+          cat > src/cities-2.json << 'EOF'
+[
+  { "city": "Kuala Lumpur", "country": "Malaysia" },
+  { "city": "Langkawi", "country": "Malaysia" },
+  { "city": "Riyadh", "country": "Saudi Arabia" },
+  { "city": "Jeddah", "country": "Saudi Arabia" },
+  { "city": "Singapore", "country": "Singapore" }
+]
+EOF
 
       - name: Run second generator (set‑and‑forget loop)
         run: node generator-loop-2.js
