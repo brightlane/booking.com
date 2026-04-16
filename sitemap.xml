@@ -1,8 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://brightlane.github.io/booking.com/index.html</loc></url>
-  <url><loc>https://brightlane.github.io/booking.com/all-inclusive-resorts-worldwide.html</loc></url>
-  <url><loc>https://brightlane.github.io/booking.com/religious-destinations-worldwide.html</loc></url>
-  <url><loc>https://brightlane.github.io/booking.com/top-100-tourist-cities-hotels.html</loc></url>
-  <url><loc>https://brightlane.github.io/booking.com/hostels-europe.html</loc></url>
+  <!-- Root / index -->
+  <url>
+    <loc>https://brightlane.github.io/booking.com/index.html</loc>
+  </url>
+
+  <!-- Resorts / all‑inclusive -->
+  <url>
+    <loc>https://brightlane.github.io/booking.com/all-inclusive-resorts-worldwide.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/religious-destinations-worldwide.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/top-100-tourist-cities-hotels.html</loc>
+  </url>
+
+  <!-- Hostels page -->
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hostels-europe.html</loc>
+  </url>
+
+  <!-- Key city hotel pages -->
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-paris.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-rome.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-london.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-tokyo.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-new-york-city.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-barcelona.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-shanghai.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-mumbai.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-dubai.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-punta-cana.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-bangkok.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-delhi.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-istanbul.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-jerusalem.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-fatima.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-lourdes.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-santiago-de-compostela.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-marrakech.html</loc>
+  </url>
+  <url>
+    <loc>https://brightlane.github.io/booking.com/hotels-in-cancun.html</loc>
+  </url>
+
+  <!-- Skyscanner affiliate redirect (optional, if you want it indexed) -->
+  <url>
+    <loc>https://brightlane.github.io/booking.com/affiliates.html</loc>
+  </url>
+
+  <!-- Optional: if you add one main affiliates page -->
+  <url>
+    <loc>https://brightlane.github.io/booking.com/robots.txt</loc>
+  </url>
 </urlset>
