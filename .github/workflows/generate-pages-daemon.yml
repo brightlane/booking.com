@@ -1,12 +1,9 @@
 name: Generate pages daemon (self‑trigger)
 
 on:
-  # Run every 12 hours
   schedule:
     - cron: "0 */12 * * *"
-  # Also allow manual run
   workflow_dispatch:
-  # Optional: self‑trigger from deploy
   page_build:
     types: [created]
 
@@ -30,44 +27,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
 
       - name: Install dependencies
         run: |
           npm install --save-dev fs-extra
-          npm install --save-dev nodemon
-          cat package.json || echo "No package.json; using bare node"
 
       - name: Run generate-pages-daemon for up to 6 hours
         run: |
           node generate-pages-daemon.js &
           DAEMON_PID=$!
-          echo "Started generate-pages-daemon.js with PID $DAEMON_PID"
           timeout 355m /bin/bash -c 'wait $DAEMON_PID || true'
-          echo "Daemon finished or timed out"
-
-      - name: List generated files (output check)
-        run: |
-          if [ -d output ]; then
-            echo "Found output/*.html:"
-            ls -l output/*.html | head -20
-            echo "Total output files: $(ls output/*.html 2>/dev/null | wc -l)"
-          else
-            echo "No output/ directory yet."
-          fi
+          sleep 10
 
       - name: Generate sitemap from generated pages
         run: |
           node generate-sitemap.js
-
-      - name: Check sitemap content
-        run: |
-          head -20 sitemap.xml
 
       - name: Commit and push
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add output/ sitemap.xml
-          git commit -m "Autogenerate pages + sitemap (self‑trigger daemon)" || echo "No changes detected"
+          git commit -m "Autogenerate pages + sitemap (self‑trigger daemon)" || echo "No changes"
           git push origin main
