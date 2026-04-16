@@ -1,7 +1,7 @@
 // generate-sitemap-simple.js
-// Generates a single sitemap.xml from all HTML files in ./output/ + a few static pages
+// Generates a single sitemap.xml from all HTML files in ./output/ + static pages
 
-const fs = require("fs-extra");
+const fs  = require("fs-extra");
 const path = require("path");
 
 const OUTPUT_DIR = path.resolve("./output");
