@@ -1,20 +1,23 @@
-name: Generate pages daemon (limited time)
+name: Generate pages daemon (long‑run)
 
 on:
-  workflow_dispatch:       # Let you run manually
+  workflow_dispatch:   # Let you click "Run workflow"
   schedule:
-    - cron: "0 2 * * *"   # Or change as needed (UTC)
+    # Run once per day at 2 AM UTC (change as you like)
+    - cron: "0 2 * * *"
 
 jobs:
   generate:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: "--max-old-space-size=8192"
+    # Maximum run time: 360 minutes (6 hours)
+    timeout-minutes: 360
 
     steps:
       - uses: actions/checkout@v4
         with:
-          # This is needed so you can git push
+          # You must create a PERSONAL_TOKEN secret in repo Settings
           token: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Setup Node
@@ -26,23 +29,39 @@ jobs:
         run: |
           npm install fs-extra
 
-      - name: Create output dir
-        run: mkdir -p output
-
-      - name: Run generate-pages-daemon for 10 minutes
+      - name: Ensure output dir
         run: |
-          # Run daemon but kill after 10 minutes
-          node generate-pages-daemon.js &
-          sleep 600
-          pkill -f generate-pages-daemon.js
+          mkdir -p output
 
-      - name: Check what was generated
-        run: ls -la output/
+      - name: Run generate-pages-daemon for up to 6 hours
+        run: |
+          # Start daemon
+          node generate-pages-daemon.js &
+          DAEMON_PID=$!
+          echo "Started daemon with PID $DAEMON_PID"
+
+          # Let it run until job timeout (max 6h)
+          # You can decrease if you like, e.g., 180 minutes (3h)
+          timeout 355m /bin/bash -c 'wait $DAEMON_PID || true'
+
+          # Brief cooldown
+          sleep 10
+
+      - name: Check how many pages generated
+        run: |
+          ls -la output/ | head -20
+          echo "Total pages in output: $(ls output/*.html | wc -l) pages"
+
+      - name: Update sitemap (if you have watch-sitemap.js)
+        run: |
+          if [ -f watch-sitemap.js ]; then
+            node watch-sitemap.js
+          fi
 
       - name: Commit and push
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add output/ sitemap.xml
-          git commit -m "Autogenerate pages + sitemap (via Actions)" || echo "No changes"
+          git commit -m "Autogenerate pages + sitemap (via long‑run daemon)" || echo "No changes"
           git push origin main
