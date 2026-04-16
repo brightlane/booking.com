@@ -23,3 +23,59 @@ jobs:
           git add -A .
           git commit -m "Auto‑gen hotels (Stream 2): $(date)" || echo "No changes"
           git push
+// update-index.js
+const fs = require('fs');
+const path = require('path');
+
+const OUT_DIRS = [
+  path.join(__dirname, 'output'),
+  path.join(__dirname, 'output-2'),
+];
+
+const INDEX_FILE = path.join(__dirname, 'index.html');
+
+let links = [];
+
+OUT_DIRS.forEach(outDir => {
+  if (!fs.existsSync(outDir)) return;
+
+  const files = fs.readdirSync(outDir);
+  files.forEach(file => {
+    if (file.startsWith('hotels-in-') && file.endsWith('.html')) {
+      const slug = file.replace(/\.html$/, '');
+      const prettyName = slug
+        .replace(/^hotels-in-/, '')
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase());
+
+      const href = `/${slug}.html`;
+      links.push(`<li><a href="${href}">${prettyName}</a></li>`);
+    }
+  });
+});
+
+// Read existing index.html but replace only the links block
+let indexContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Hotel Deals. — Save Big on Hotels at Booking.com | 2026</title>
+  <meta name="description" content="Find the best hotels, apartments, resorts, villas, B&amp;Bs, and guesthouses worldwide." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Hotel Deals. — New Pages</h1>
+    <ul class="index-links">
+      :::LINKS:::
+    </ul>
+  </div>
+</body>
+</html>
+`.replace(':::LINKS:::', links.slice(-1000).join('\n')); // latest 1000 links
+
+fs.writeFileSync(INDEX_FILE, indexContent, 'utf8');
+
+console.log(`✅ Updated index.html with ${links.length} links (showing latest 1000).`);
