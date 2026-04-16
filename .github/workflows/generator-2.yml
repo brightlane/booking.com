@@ -1,8 +1,45 @@
-// generator-loop-2.js
+name: "Hotel Deals – Run Hotels (auto index)"
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # 6:00 UTC every day
+  workflow_dispatch:      # manual runs
+
+jobs:
+  generate_pages:
+    runs-on: ubuntu-latest
+    env:
+      AI1_KEY: ${{ secrets.AI1_KEY }}
+      AI2_KEY: ${{ secrets.AI2_KEY }}
+      AI3_KEY: ${{ secrets.AI3_KEY }}
+      AI4_KEY: ${{ secrets.AI4_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install node-fetch@2
+
+      - name: Run hotel generator (Stream 2)
+        run: node generator-loop-2.js
+
+      - name: Update index.html with new pages
+        run: node update-index.js
+
+      - name: Commit output and index.html
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add -A .
+          git commit -m "Auto‑gen hotels + update index: $(date)" || echo "No changes"
+          git push// generator-loop-2.js
 const fs = require('fs');
 const path = require('path');
 
-// Pages live directly in root: https://brightlane.github.io/booking.com/hotels-in-...
 const OUT_DIR = path.join(__dirname, '');
 
 const BOOKING_AID = "8132800";
@@ -49,7 +86,7 @@ const dummyCities = [
   { city: "Bangkok", country: "Thailand" },
 ];
 
-const MAX_PAGES_PER_RUN = 100;          // 100 pages per run
+const MAX_PAGES_PER_RUN = 100;
 const MAX_CHARS_PER_PAGE = 30_000;
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -239,79 +276,34 @@ function loopTick() {
   setTimeout(() => {
     setImmediate(loopTick);
   }, delayMs);
-}// update-index.js
-const fs = require('fs');
-const path = require('path');
+}
 
-const OUT_DIRS = [
-  path.join(__dirname, 'output'),
-  path.join(__dirname, 'output-2'),
-];
-
-const INDEX_FILE = path.join(__dirname, 'index.html');
-const SITEMAP_FILE = path.join(__dirname, 'sitemap.xml');
-
-const HOST = 'https://brightlane.github.io/booking.com';
-
-let links = [];
-let sitemapUrls = [];
-
-OUT_DIRS.forEach(outDir => {
-  if (!fs.existsSync(outDir)) return;
-
-  const files = fs.readdirSync(outDir);
-  files.forEach(file => {
-    if (file.startsWith('hotels-in-') && file.endsWith('.html')) {
-      const slug = file.replace(/\.html$/, '');
-      // Correct path for GitHub Pages
-      const href = `/booking.com/${slug}.html`;
-      links.push(`<li><a href="${href}">${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</a></li>`);
-      sitemapUrls.push(`${HOST}/${slug}.html`);
-    }
-  });
-});
-
-// Build index.html (latest 1000 links)
-let indexContent = `
-<!DOCTYPE html>
+console.log(`🚀 Hotel Deals – Stream 2 generator started (pages at /booking.com/hotels-in-*.html).`);
+loopTick();<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="google-site-verification" content="eWVDN3vbam9nnaZQu7wAQKyfmJJdM7zjI80l4DGeUrQ" />
-  <meta name="msvalidate.01" content="574044E39556B8B8DAAF1D1F233C87B0" />
   <meta charset="utf-8" />
-  <title>Hotel Deals. — New Pages</title>
-  <meta name="description" content="Newly generated hotel pages for Booking.com (aid=8132800)." />
+  <title>Page not found — Hotel Deals</title>
+  <link rel="canonical" href="https://brightlane.github.io/booking.com/" />
+  <meta http-equiv="refresh" content="3; url=/booking.com/" />
+  <meta name="robots" content="noindex, follow" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Hotel Deals. — New Pages</h1>
-    <ul class="index-links">
-      :::LINKS:::
-    </ul>
+  <div style="max-width: 800px; margin: 4rem auto; padding: 1rem; text-align: center;">
+    <h1>Page not found</h1>
+    <p>
+      We couldn’t find the page you requested.
+    </p>
+    <p>
+      You will be redirected to the <a href="/booking.com/">Hotel Deals home page</a> in a few seconds.
+    </p>
+    <p>
+      If your browser doesn’t redirect automatically, <a href="/booking.com/">click here</a>.
+    </p>
   </div>
 </body>
 </html>
-`.replace(':::LINKS:::', links.slice(-1000).join('\n'));
-
-fs.writeFileSync(INDEX_FILE, indexContent, 'utf8');
-
-// Build sitemap.xml
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${sitemapUrls.map(url => `
-  <url>
-    <loc>${url}</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>`).join('')}
-</urlset>
-`;
-
-fs.writeFileSync(SITEMAP_FILE, sitemap, 'utf8');
-
-console.log(`✅ Updated index.html (latest 1000 links) and sitemap.xml (${sitemapUrls.length} URLs).`);
-
-console.log(`🚀 Hotel Deals – Stream 2 generator started (pages at /booking.com/hotels-in-*.html).`);
-loopTick();
+git add .github/workflows/generator-2.yml generator-loop-2.js update-index.js 404.html index.html styles.css
+git commit -m "one‑shot deploy: hotel generator, index/sitemap, 404 redirect, clear workflow name"
+git push origin main
