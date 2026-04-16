@@ -1,0 +1,314 @@
+// generate-pages.js
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
+
+const AID = "8132800";
+const SKY_URL = "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885";
+
+const BOOKING_HOME = `https://www.booking.com/index.html?aid=${AID}`;
+const BOOKING_APARTMENTS = `https://www.booking.com/apartments/index.html?aid=${AID}`;
+const BOOKING_RESORTS = `https://www.booking.com/resorts/index.html?aid=${AID}`;
+const BOOKING_VILLAS = `https://www.booking.com/villas/index.html?aid=${AID}`;
+const BOOKING_BNB = `https://www.booking.com/bed-and-breakfast/index.html?aid=${AID}`;
+const BOOKING_GUESTHOUSE = `https://www.booking.com/guest-house/index.html?aid=${AID}`;
+
+// Example cities (expand this to 10k+ later)
+const CITIES = [
+  "paris",
+  "rome",
+  "london",
+  "tokyo",
+  "new-york-city",
+  "barcelona",
+  "shanghai",
+  "mumbai",
+  "dubai",
+  "punta-cana",
+  "bangkok",
+  "delhi",
+  "istanbul",
+  "jerusalem",
+  "fatima",
+  "lourdes",
+  "santiago-de-compostela",
+  "marrakech",
+  "cancun",
+].map((c) => c.toLowerCase());
+
+// We don't really generate 100M here; you’d pipe this from a huge list later.
+const TARGET_PAGES = 100000; // 100k for now (you can tune later)
+
+const OUT_DIR = path.join(__dirname, "pages");
+const BASE_URL = "https://brightlane.github.io/booking.com/";
+
+if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
+
+function capitalize(text) {
+  return text
+    .split("-").map((s) => s[0].toUpperCase() + s.slice(1))
+    .join(" ");
+}
+
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const BOOKING_HUBS = [
+  { url: "/top-100-tourist-cities-hotels.html", text: "Top 100 tourist cities – hotels" },
+  { url: "/all-inclusive-resorts-worldwide.html", text: "All‑inclusive resorts worldwide" },
+  { url: "/religious-destinations-worldwide.html", text: "Religious destinations worldwide" },
+  { url: "/hostels-europe.html", text: "Hostels in Europe" },
+  { url: "/affiliates.html", text: "Affiliate info" },
+];
+
+const BOOKING_TYPES = [
+  { url: BOOKING_HOME, text: "Hotels homepage" },
+  { url: BOOKING_APARTMENTS, text: "Apartments" },
+  { url: BOOKING_RESORTS, text: "Resorts" },
+  { url: BOOKING_VILLAS, text: "Villas" },
+  { url: BOOKING_BNB, text: "Bed & Breakfast (B&B)" },
+  { url: BOOKING_GUESTHOUSE, text: "Guesthouses" },
+];
+
+function generatePageContent({ city, pageType, title, h1, intro, subheading, patternLabel }) {
+  const cityCap = capitalize(city);
+  const crossLinks = BOOKING_HUBS.map(
+    (h) => `<a href="${BASE_URL}${h.url.slice(1)}">${h.text}</a>`
+  ).join(" | ");
+
+  const bookingLinks = BOOKING_TYPES.map(
+    (t) => `<li><a href="${t.url}" target="_blank">${t.text}</a></li>`
+  ).join("\n");
+
+  const externalBookingSearch = `
+<form action="https://www.booking.com/searchresults.html" method="GET" target="_blank">
+  <input type="hidden" name="aid" value="${AID}" />
+  <div style="margin: 1rem 0;">
+    <label>Search hotels in ${cityCap}</label>
+    <input type="text" name="ss" value="${cityCap}" placeholder="Destination" required style="margin-left: 0.5rem; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;" />
+  </div>
+  <button type="submit" style="padding: 0.5rem 1rem; background: #009fe3; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    Search on Booking.com (aid=${AID})
+  </button>
+</form>
+  `;
+
+  const schema = `
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Place",
+  "name": "${title}",
+  "description": "Find hotels in ${cityCap} using Booking.com and Skyscanner.",
+  "url": "${BASE_URL}${pageType}-${city}.html"
+}
+</script>
+  `;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${title}</title>
+  <meta name="description" content="${intro}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="${BASE_URL}${pageType}-${city}.html" />
+  <link rel="sitemap" href="${BASE_URL}sitemap.xml" />
+  <link rel="robots" href="${BASE_URL}robots.txt" />
+
+  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="${intro}" />
+  <meta property="og:url" content="${BASE_URL}${pageType}-${city}.html" />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root {
+      --bc-blue: #003580;
+      --bc-cyan: #009fe3;
+      --bc-yellow: #feba02;
+      --bc-white: #fff;
+      --bc-bg: #f2f6fa;
+      --bc-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      line-height: 1.6;
+      background: var(--bc-bg);
+      color: #333;
+    }
+    .navbar {
+      background: var(--bc-blue);
+      color: white;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .search-box {
+      background: linear-gradient(180deg, #003580, #000000);
+      color: white;
+      padding: 1.5rem 1rem;
+      margin: 0 -1rem 1.5rem;
+      text-align: center;
+    }
+    .content {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .card {
+      background: var(--bc-white);
+      border-radius: 8px;
+      padding: 1.2rem;
+      margin: 1rem 0;
+      box-shadow: var(--bc-shadow);
+    }
+    a {
+      color: var(--bc-blue);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .footer {
+      background: #f8f9fa;
+      padding: 2rem 0;
+      margin-top: 3rem;
+      color: #666;
+    }
+  </style>
+
+  ${schema}
+</head>
+<body>
+
+  <nav class="navbar">
+    <div>HotelInDeals</div>
+    <div>
+      <a href="${BASE_URL}index.html">Home</a>
+      <a href="${BASE_URL}affiliates.html">Affiliates</a>
+    </div>
+  </nav>
+
+  <section class="search-box">
+    <h1>${h1}</h1>
+    <p>${intro}</p>
+    ${externalBookingSearch}
+  </section>
+
+  <main class="content">
+    <h2>${subheading}</h2>
+    <p>
+      ${intro}
+    </p>
+
+    <div class="card">
+      <h3>${patternLabel} in ${cityCap}</h3>
+      <p>
+        Whether you need a hotel in ${cityCap}, a resort outside the city, or an apartment in the center,
+        Booking.com offers a wide range of properties that fit your budget and travel style.
+      </p>
+      <ul>
+        ${bookingLinks}
+      </ul>
+      <p>
+        All links above use your affiliate ID <code>aid=${AID}</code> and never change inside the generator.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Skyscanner flight comparison</h3>
+      <p>
+        Compare flights to ${cityCap} with our Skyscanner affiliate link:
+      </p>
+      <p>
+        <a href="${SKY_URL}" target="_blank">Skyscanner flight search</a>
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Explore more destinations</h3>
+      <p>
+        While you're here, check out:
+      </p>
+      <p>
+        ${crossLinks}
+      </p>
+    </div>
+  </main>
+
+  <footer class="footer text-center">
+    <p>
+      HotelInDeals – 1B+ Hotel Guides Worldwide – 2026.<br>
+      All Booking.com links contain affiliate ID: <code>aid=${AID}</code>.
+    </p>
+  </footer>
+
+</body>
+</html>`;
+}
+
+function generatePage({ city, pageType, title, h1, intro, subheading, patternLabel }) {
+  const fileName = `${pageType}-${city}.html`;
+  const filePath = path.join(OUT_DIR, fileName);
+  const content = generatePageContent({
+    city,
+    pageType,
+    title,
+    h1,
+    intro,
+    subheading,
+    patternLabel,
+  });
+  fs.writeFileSync(filePath, content);
+  console.log(`Generated: ${fileName}`);
+}
+
+function run() {
+  const types = [
+    { id: "hotels-in", label: "Hotels in" },
+    // Optional: later you can add more patterns
+    // { id: "hotels-near-airport-in", label: "Hotels near airport in" },
+    // { id: "hotel-near-beach-in", label: "Hotel near beach in" },
+  ];
+
+  let generated = 0;
+
+  for (let i = 0; generated < TARGET_PAGES && i < CITIES.length; i++) {
+    const city = CITIES[i];
+    const cityCap = capitalize(city);
+
+    for (const type of types) {
+      if (generated >= TARGET_PAGES) break;
+
+      const title = `${type.label} ${cityCap} • HotelInDeals 2026`;
+      const h1 = `${type.label} ${cityCap} – Hotels, Apartments, Resorts & Villas`;
+      const intro = `Find the best ${type.label.toLocaleLowerCase()} ${cityCap} with Booking.com and compare flights using Skyscanner.`;
+      const subheading = `What you can find ${type.label.toLocaleLowerCase()} ${cityCap}`;
+      const patternLabel = type.label;
+
+      generatePage({
+        city,
+        pageType: type.id,
+        title,
+        h1,
+        intro,
+        subheading,
+        patternLabel,
+      });
+
+      generated++;
+    }
+  }
+
+  console.log(`\n✅ Generated ${generated} pages into ${OUT_DIR}.\n`);
+}
+
+run();
