@@ -1,4 +1,9 @@
 // generate-sitemap.js
+//
+// 1. Reads all HTML files in ./output
+// 2. Generates sitemap.xml listing EVERY generated page
+// 3. Outputs to the repo root so GitHub Pages can serve it
+
 const fs = require("fs-extra");
 const path = require("path");
 
@@ -17,13 +22,18 @@ ${urls
 `;
 
   fs.writeFileSync(SITEMAP_FILE, xml);
-  console.log(`✅ sitemap.xml written with ${urls.length} URLs.`);
+  console.log(
+    `✅ sitemap.xml written with ${urls.length} URLs.`
+  );
+  console.log(
+    `   → Open: https://brightlane.github.io/booking.com/sitemap.xml`
+  );
 }
 
 async function buildSitemap() {
   const urls = [];
 
-  // Add static index + list pages
+  // 1. Static index + list pages (optional, keep them)
   const staticUrls = [
     `${BASE_URL}index.html`,
     `${BASE_URL}all-inclusive-resorts-worldwide.html`,
@@ -34,7 +44,7 @@ async function buildSitemap() {
 
   urls.push(...staticUrls);
 
-  // Read all generated HTML files in output
+  // 2. ALL generated HTML files in ./output
   if (await fs.pathExists(OUTPUT_DIR)) {
     const files = await fs.readdir(OUTPUT_DIR);
     for (const file of files) {
@@ -42,8 +52,13 @@ async function buildSitemap() {
         urls.push(`${BASE_URL}output/${file}`);
       }
     }
+  } else {
+    console.log(
+      "⚠️ OUTPUT_DIR does not exist; did you run generate-pages-daemon.js?"
+    );
   }
 
+  // 3. Write final sitemap
   generateSitemapXML(urls);
 }
 
