@@ -2,17 +2,16 @@ name: "Hotel Deals – Run Hotels (auto index)"
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # 6:00 UTC every day
-  workflow_dispatch:      # manual runs
+    - cron: "0 6 * * *"
+  workflow_dispatch:
 
 jobs:
   generate_pages:
     runs-on: ubuntu-latest
-    env:
-      AI1_KEY: ${{ secrets.AI1_KEY }}
-      AI2_KEY: ${{ secrets.AI2_KEY }}
-      AI3_KEY: ${{ secrets.AI3_KEY }}
-      AI4_KEY: ${{ secrets.AI4_KEY }}
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -30,13 +29,13 @@ jobs:
       - name: Update index.html with new pages
         run: node update-index.js
 
-      - name: Deploy and fix all hotel pages (one file does it all)
-        run: node deploy-hotels.js
+      - name: Build site
+        run: node build-site.js
 
       - name: Commit output and index.html
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           git add -A .
-          git commit -m "Auto‑gen + deploy hotels: $(date)" || echo "No changes"
+          git commit -m "Auto-gen hotels + build site: $(date)" || echo "No changes"
           git push
