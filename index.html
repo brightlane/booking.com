@@ -41,25 +41,27 @@
       color: #333;
     }
 
-    /* Make the top of the page (navbar + search) clickable */
-    .clickable-top {
+    /* Make the top half of the page clickable */
+    .clickable-top-half {
       position: relative;
       cursor: pointer;
     }
-    .clickable-top::after {
+    .clickable-top-half::after {
       content: "";
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      bottom: 0;
+      /* headroom for navbar + search + hero */
+      height: 120vh;
       z-index: 1;
     }
-    .clickable-top a,
-    .clickable-top button,
-    .clickable-top input,
-    .clickable-top select,
-    .clickable-top label {
+    .clickable-top-half a,
+    .clickable-top-half button,
+    .clickable-top-half input,
+    .clickable-top-half select,
+    .clickable-top-half label,
+    .clickable-top-half h1 {
       z-index: 2;
       position: relative;
     }
@@ -97,6 +99,10 @@
       font-size: 2.8rem;
       font-weight: 700;
       margin: 0.2rem 0;
+      cursor: pointer;
+    }
+    .hero h1 span {
+      text-decoration: underline;
     }
     .hero p {
       max-width: 780px;
@@ -164,7 +170,7 @@
       background-color: #f5a900;
     }
 
-    /* Hub‑style tiles (Booking‑com colors, easy to read) */
+    /* Hub‑style tiles (cross‑linked to your other pages) */
     .container {
       max-width: 1140px;
       margin: 0 auto;
@@ -341,8 +347,8 @@
 </head>
 <body>
 
-<!-- Top of the page is clickable (navbar + search) -->
-<div class="clickable-top"
+<!-- Top half of the page is clickable everywhere (including headline) -->
+<div class="clickable-top-half"
      onclick="window.open(pickBooking(), '_blank');">
 
   <!-- Minimal Booking‑com‑style navbar -->
@@ -398,34 +404,36 @@
     </form>
   </div>
 
-</div>
+  <!-- Hero / Booking‑style landing (headline is clickable) -->
+  <section class="hero">
+    <h1 onclick="window.open(pickBooking(), '_blank'); return false;">
+      <span>Save Big on Hotels at Booking.com — Instantly and for Free</span>
+    </h1>
+    <p>
+      Booking.com often shows <strong>lower prices, free cancellation</strong>, and <strong>secret deals</strong>
+      compared to hotels’ own sites. If you book through Booking.com, you usually get the best rate
+      for your stay without any extra fees.
+    </p>
+    <p>
+      With our guides, you can find the best deals on <strong>hotels in [city]</strong>,
+      <strong>hotels near [place]</strong>, <strong>apartments</strong>, <strong>resorts</strong>,
+      <strong>villas</strong>, and <strong>bed and breakfasts</strong> worldwide in 2026.
+    </p>
+    <p>
+      <strong>Every page on HotelInDeals leads you to a Booking.com link with aid=8132800</strong>,
+      so you always save when you book at Booking.com.
+    </p>
+    <a href="#" class="cta"
+       onclick="window.open(pickBooking(), '_blank'); return false;">
+      Book on Booking.com and Save Money (aid=8132800, GitHub)
+    </a>
+  </section>
 
-<!-- Hero / Booking‑style landing (focused on saving money at Booking.com) -->
-<section class="hero">
-  <h1>Save Big on Hotels at Booking.com — Instantly and for Free</h1>
-  <p>
-    Booking.com often shows <strong>lower prices, free cancellation</strong>, and <strong>secret deals</strong>
-    compared to hotels’ own sites. If you book through Booking.com, you usually get the best rate
-    for your stay without any extra fees.
-  </p>
-  <p>
-    With our guides, you can find the best deals on <strong>hotels in [city]</strong>,
-    <strong>hotels near [place]</strong>, <strong>apartments</strong>, <strong>resorts</strong>,
-    <strong>villas</strong>, and <strong>bed and breakfasts</strong> worldwide in 2026.
-  </p>
-  <p>
-    <strong>Every page on HotelInDeals leads you to a Booking.com link with aid=8132800</strong>,
-    so you always save when you book at Booking.com.
-  </p>
-  <a href="#" class="cta"
-     onclick="window.open(pickBooking(), '_blank'); return false;">
-    Book on Booking.com and Save Money (aid=8132800, GitHub)
-  </a>
-</section>
+</div>
 
 <div class="container">
 
-  <!-- Main tiles (HotelInDeals structure, more Booking‑com‑like and readable) -->
+  <!-- Main tiles with cross‑linking to your other pages -->
   <div class="row">
     <div class="col-lg-4">
       <div class="card-fancy">
@@ -442,14 +450,4 @@
           <a href="/hotels-in-paris.html" class="hub-link">Hotels in Paris</a> |
           <a href="/hotels-in-rome.html" class="hub-link">Hotels in Rome</a> |
           <a href="/hotels-in-tokyo.html" class="hub-link">Hotels in Tokyo</a> |
-          <a href="/hotels-in-new-york-city.html" class="hub-link">Hotels in New York City</a>
-        </p>
-      </div>
-    </div>
-
-    <div class="col-lg-4">
-      <div class="card-fancy">
-        <h3>Hotels near [Place]</h3>
-        <p>
-          For searches like “hotels near airport in [city]” or “hotel near downtown in [city]”,
-         
+          <a href="/hotels-in-new
