@@ -1,10 +1,9 @@
 // affiliates.js
 //
-// 1. Booking.com: 6 landing pages (all aid=8132800 → GitHub affiliate)
-// 2. Skyscanner: 1 main affiliate URL (update aff_id if yours is different)
-// 3. All URLs stay 100% intact; can be intermingled into pages
+// 1. Booking.com: 6 landing pages, all using aid=8132800 (GitHub)
+// 2. Skyscanner: main affiliate URL (change aff_id if yours is different)
+// 3. All URLs stay 100% intact; helpers pick which one to use
 
-// === 1. Booking.com affiliate URLs (aid=8132800 = GitHub) ===
 exports.BOOKING = {
   HOME: "https://www.booking.com/index.html?aid=8132800",
   APARTMENTS: "https://www.booking.com/apartments/index.html?aid=8132800",
@@ -14,13 +13,13 @@ exports.BOOKING = {
   GUESTHOUSES: "https://www.booking.com/guest-house/index.html?aid=8132800",
 };
 
-// === 2. Skyscanner affiliate URL (example: aff_id=21885) ===
-// Replace 21885 with your real aff_id if it's different
+// === 2. Skyscanner affiliate URL ===
+// Replace 21885 with your actual aff_id if different
 exports.SKY = {
   MAIN: "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885",
 };
 
-// === 3. Helper functions (optional but handy) ===
+// === 3. Helper functions ===
 
 // Randomly pick one of your 6 Booking.com URLs
 exports.pickBooking = () => {
