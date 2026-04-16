@@ -1,68 +1,73 @@
 name: Generate pages daemon (self‑trigger)
 
 on:
-  workflow_dispatch:   # Let you manually start it once
-  workflow_call:       # Allow this workflow to be called by itself
+  # Run every 12 hours
+  schedule:
+    - cron: "0 */12 * * *"
+  # Also allow manual run
+  workflow_dispatch:
+  # Optional: self‑trigger from deploy
+  page_build:
+    types: [created]
+
+permissions:
+  contents: write
+  pages: write
 
 jobs:
-  generate:
+  generate-pages-daemon:
+    name: Generate hotel pages + dynamic sitemap
     runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: "--max-old-space-size=8192"
-    # Maximum run time: 360 minutes (6 hours)
-    timeout-minutes: 360
+    timeout-minutes: 370
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "20"
+          cache: "npm"
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
-          npm install fs-extra chokidar
-
-      - name: Ensure output dir
-        run: |
-          mkdir -p output
+          npm install --save-dev fs-extra
+          npm install --save-dev nodemon
+          cat package.json || echo "No package.json; using bare node"
 
       - name: Run generate-pages-daemon for up to 6 hours
         run: |
           node generate-pages-daemon.js &
           DAEMON_PID=$!
-          echo "Started daemon with PID $DAEMON_PID"
+          echo "Started generate-pages-daemon.js with PID $DAEMON_PID"
           timeout 355m /bin/bash -c 'wait $DAEMON_PID || true'
-          sleep 10
+          echo "Daemon finished or timed out"
 
-      - name: Check how many pages generated
+      - name: List generated files (output check)
         run: |
-          ls -la output/ | head -20
-          echo "Total pages in output: $(ls output/*.html | wc -l) pages"
-
-      - name: Update sitemap (if you have watch-sitemap.js)
-        run: |
-          if [ -f watch-sitemap.js ]; then
-            node watch-sitemap.js
+          if [ -d output ]; then
+            echo "Found output/*.html:"
+            ls -l output/*.html | head -20
+            echo "Total output files: $(ls output/*.html 2>/dev/null | wc -l)"
+          else
+            echo "No output/ directory yet."
           fi
+
+      - name: Generate sitemap from generated pages
+        run: |
+          node generate-sitemap.js
+
+      - name: Check sitemap content
+        run: |
+          head -20 sitemap.xml
 
       - name: Commit and push
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add output/ sitemap.xml
-          git commit -m "Autogenerate pages + sitemap (self‑trigger daemon)" || echo "No changes"
+          git commit -m "Autogenerate pages + sitemap (self‑trigger daemon)" || echo "No changes detected"
           git push origin main
-
-      # Self‑trigger the same workflow again (set‑and‑forget)
-      - name: Self‑trigger next run
-        run: |
-          echo "Triggering next run of generate-pages-daemon.yml..."
-          curl -X POST \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/generate-pages-daemon.yml/dispatches \
-            -d '{"ref":"main","inputs":{}}'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
