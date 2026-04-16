@@ -1,15 +1,12 @@
 {
-  "name": "booking-com-affiliate-site",
+  "name": "hotel-deals-generator",
   "version": "1.0.0",
-  "description": "Auto-generate 2000 hotel pages daily with Booking.com + Skyscanner affiliate links",
-  "main": "one-file-everything.js",
+  "main": "generator-loop.js",
   "scripts": {
-    "start": "node one-file-everything.js"
+    "generate": "node generator-loop.js"
   },
   "dependencies": {
-    "fs-extra": "^11.2.0"
-  },
-  "devDependencies": {},
-  "author": "Benny \"Palmo Kid\" Palmarino",
-  "license": "MIT"
+    "node-fetch": "^2.6.12",
+    "dotenv": "^16.3.1"
+  }
 }
