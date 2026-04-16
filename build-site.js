@@ -1,53 +1,80 @@
-name: Build and deploy GitHub Pages site
+const fs = require('fs');
+const path = require('path');
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+const ROOT = __dirname;
+const SITE_URL = 'https://brightlane.github.io/booking.com/';
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+const hotels = [
+  'london',
+  'paris',
+  'rome',
+  'barcelona',
+  'madrid'
+];
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+function makePage(city) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotels in ${city}</title>
+  <meta name="description" content="Find hotels in ${city}.">
+</head>
+<body>
+  <main>
+    <h1>Hotels in ${city}</h1>
+    <p>Sample generated page for ${city}.</p>
+    <a href="index.html">Home</a>
+  </main>
+</body>
+</html>`;
+}
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+function makeIndex() {
+  const links = hotels.map(city => `<li><a href="hotels-in-${city}.html">Hotels in ${city}</a></li>`).join('\n');
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Booking.com Pages</title>
+  <meta name="description" content="Generated hotel pages.">
+</head>
+<body>
+  <main>
+    <h1>Booking.com Pages</h1>
+    <ul>
+      ${links}
+    </ul>
+  </main>
+</body>
+</html>`;
+}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
+fs.writeFileSync(path.join(ROOT, 'index.html'), makeIndex(), 'utf8');
 
-      - name: Install dependencies
-        run: npm install
+for (const city of hotels) {
+  fs.writeFileSync(path.join(ROOT, `hotels-in-${city}.html`), makePage(city), 'utf8');
+}
 
-      - name: Run site builder
-        run: node build-site.js
+fs.writeFileSync(path.join(ROOT, '404.html'), `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Not Found</title></head>
+<body><h1>Page not found</h1></body>
+</html>`, 'utf8');
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+const pages = fs.readdirSync(ROOT)
+  .filter(file => file.endsWith('.html') && file !== '404.html')
+  .map(file => `<url><loc>${SITE_URL}${file}</loc></url>`)
+  .join('\n');
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages}
+</urlset>
+`;
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), sitemap, 'utf8');
+
+console.log('Generated site pages and sitemap.xml');
