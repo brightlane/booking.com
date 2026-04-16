@@ -1,9 +1,8 @@
 // generator-loop-2.js
-
 const fs = require('fs');
 const path = require('path');
 
-// Output straight into site root = /booking.com/... links
+// Pages live directly in root: https://brightlane.github.io/booking.com/hotels-in-...
 const OUT_DIR = path.join(__dirname, '');
 
 const BOOKING_AID = "8132800";
@@ -37,7 +36,6 @@ function pickSky() {
   return SKY.MAIN;
 }
 
-// ======== DUMMY CITIES (no JSON parse needed) ========
 const dummyCities = [
   { city: "Kuala Lumpur", country: "Malaysia" },
   { city: "Langkawi", country: "Malaysia" },
@@ -51,7 +49,7 @@ const dummyCities = [
   { city: "Bangkok", country: "Thailand" },
 ];
 
-const MAX_PAGES_PER_RUN = 100;
+const MAX_PAGES_PER_RUN = 100;          // 100 pages per run
 const MAX_CHARS_PER_PAGE = 30_000;
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
