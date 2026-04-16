@@ -1,0 +1,132 @@
+const fs = require("fs-extra");
+const path = require("path");
+
+const BOOKING = {
+  HOME: "https://www.booking.com/index.html?aid=1858279",
+  APARTMENTS: "https://www.booking.com/apartments/index.html?aid=1858279",
+  RESORTS: "https://www.booking.com/resorts/index.html?aid=1858279",
+  VILLAS: "https://www.booking.com/villas/index.html?aid=1858279",
+  BNB: "https://www.booking.com/bed-and-breakfast/index.html?aid=1858279",
+  GUESTHOUSES: "https://www.booking.com/guest-house/index.html?aid=1858279",
+};
+
+const SKY = {
+  HOME:
+    "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885",
+};
+
+// Path to your JSON data
+const INPUT_DATA = "./config/hostels-europe.json";
+const OUTPUT_DIR = "./output";
+
+// Template per hotel/hostel
+function renderHostelPage(entry) {
+  const {
+    id,
+    name,
+    city,
+    country,
+    lat,
+    lng,
+    tags,
+    website,
+    booking_link,
+    skyscanner_link,
+    languages_offered,
+  } = entry;
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${name} in ${city} – Booking.com &amp; Skyscanner</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="${entry.description_en.slice(0, 200)}...">
+</head>
+<body>
+
+<div class="container py-4">
+
+  <h1>${name} – Hostel in ${city}, ${country}</h1>
+
+  <p>Located at: ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+  <p><strong>Tags:</strong> ${tags.join(", ")}</p>
+
+  <p>
+    <a href="${website}" target="_blank">Official site</a><br>
+    <a href="${booking_link}" target="_blank">Book on Booking.com (your ID)</a><br>
+    <a href="${skyscanner_link}" target="_blank">Check flights on Skyscanner (your ID)</a>
+  </p>
+
+  <section class="my-4">
+    <h2>Descriptions</h2>
+    ${languages_offered
+      .map(
+        (lang) =>
+          `<p><strong>${lang.toUpperCase()}:</strong> ${
+            entry[`description_${lang}`] || entry.description_en
+          }</p>`
+      )
+      .join("\n")}
+  </section>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Hotel",
+    "name": "${name}",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "${city}",
+      "addressCountry": "${country}"
+    },
+    "latitude": ${lat},
+    "longitude": ${lng},
+    "url": "https://${city.toLowerCase().replace(" ", "-")}-hostel-${id}.example.com"
+  }
+  </script>
+
+</div>
+
+</body>
+</html>
+  `.trim();
+}
+
+async function generatePages() {
+  const data = await fs.readJSON(INPUT_DATA);
+
+  if (!data.length) {
+    console.log("No entries in input JSON.");
+    return;
+  }
+
+  // Reset output
+  await fs.ensureDir(OUTPUT_DIR);
+
+  // Daily target: 2000 pages
+  const totalTarget = 2000;
+  const cycle = [...data]; // 2 hostels
+
+  for (let i = 0; i < totalTarget; i++) {
+    const idx = i % cycle.length;
+    const entry = { ...cycle[idx], id: `${cycle[idx].id}-${i + 1}` };
+
+    const filename = path.join(
+      OUTPUT_DIR,
+      `hostel-${entry.city.toLowerCase().replace(/\s/g, "-")}-${entry.id}.html`
+    );
+
+    const html = renderHostelPage(entry);
+    await fs.writeFile(filename, html);
+  }
+
+  console.log(
+    `✅ Generated ${totalTarget} pages from ${cycle.length} hostel entries.`
+  );
+}
+
+// Run this daily
+generatePages().catch(console.error);
