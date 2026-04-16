@@ -90,3 +90,68 @@
     <loc>https://brightlane.github.io/booking.com/robots.txt</loc>
   </url>
 </urlset>
+// append-new-pages-to-sitemap.js
+// Appends all ./output/*.html URLs to the bottom of your existing sitemap.xml
+// Keeps your existing Booking.com / skyscanner URLs intact
+
+const fs   = require("fs-extra");
+const path = require("path");
+
+const OUTPUT_DIR   = path.resolve("./output");
+const SITEMAP_FILE = path.resolve("sitemap.xml");
+const BASE_URL     = "https://brightlane.github.io/booking.com/";
+
+async function appendNewPages() {
+  // 1. Read current sitemap (your existing Booking.com / skyscanner URLs)
+  const xml = await fs.readFile(SITEMAP_FILE, "utf8");
+
+  // 2. Extract URLs already in the sitemap
+  const existingUrls = [];
+  const urlMatch = /<loc>(.*?)<\/loc>/g;
+  let match;
+  while ((match = urlMatch.exec(xml)) !== null) {
+    existingUrls.push(match[1]);
+  }
+
+  // 3. Scan ./output/ for new HTML files
+  const newUrls = [];
+
+  if (await fs.pathExists(OUTPUT_DIR)) {
+    const files = await fs.readdir(OUTPUT_DIR);
+    for (const file of files) {
+      if (file.endsWith(".html")) {
+        const loc = `${BASE_URL}output/${file}`;
+        if (!existingUrls.includes(loc)) {
+          newUrls.push(loc);
+        }
+      }
+    }
+  }
+
+  if (newUrls.length === 0) {
+    console.log("No new pages to add to sitemap.");
+    return;
+  }
+
+  console.log("Appending %d new URLs to sitemap.xml", newUrls.length);
+
+  // 4. Build XML blocks for new URLs
+  const newUrlBlocks = newUrls
+    .map((loc) => `  <url><loc>${loc.replace(/&/g, "&amp;")}</loc></url>`)
+    .join("\n");
+
+  // 5. Insert new URLs just before </urlset>
+  const finalXml = xml
+    .replace(/(<\/urlset>)/, `${newUrlBlocks}\n$1`);
+
+  // 6. Write back the updated sitemap
+  await fs.writeFile(SITEMAP_FILE, finalXml);
+
+  console.log("✅ Added %d new URLs. Now open:", newUrls.length);
+  console.log("https://brightlane.github.io/booking.com/sitemap.xml");
+}
+
+appendNewPages().catch((err) => {
+  console.error("append-new-pages-to-sitemap.js failed:", err.toString());
+  process.exit(1);
+});
