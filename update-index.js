@@ -10,10 +10,16 @@ const INDEX_FILE = path.join(__dirname, 'index.html');
 const SITEMAP_FILE = path.join(__dirname, 'sitemap.xml');
 
 const HOST = 'https://brightlane.github.io/booking.com';
+const INDEX_URL = `${HOST}/`;
 
 let links = [];
 let sitemapUrls = [];
 
+// Just announce that pages exist; don’t link to individual files
+links.push(`<li><strong>Hotel Deals — New hotel pages are being generated automatically.</strong></li>`);
+links.push(`<li>All pages are indexed via the main site: <a href="${INDEX_URL}">Hotel Deals home</a></li>`);
+
+// Optionally keep sitemap URLs for search engines (they can still be 404‑safe later)
 OUT_DIRS.forEach(outDir => {
   if (!fs.existsSync(outDir)) return;
 
@@ -21,13 +27,13 @@ OUT_DIRS.forEach(outDir => {
   files.forEach(file => {
     if (file.startsWith('hotels-in-') && file.endsWith('.html')) {
       const slug = file.replace(/\.html$/, '');
-      const href = `/booking.com/${slug}.html`;
-      links.push(`<li><a href="${href}">${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</a></li>`);
-      sitemapUrls.push(`${HOST}/${slug}.html`);
+      const pageUrl = `${HOST}/${slug}.html`;
+      sitemapUrls.push(pageUrl);
     }
   });
 });
 
+// Build index.html pointing only to /booking.com/
 let indexContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -49,10 +55,11 @@ let indexContent = `
   </div>
 </body>
 </html>
-`.replace(':::LINKS:::', links.slice(-1000).join('\n'));
+`.replace(':::LINKS:::', links.join('\n'));
 
 fs.writeFileSync(INDEX_FILE, indexContent, 'utf8');
 
+// Sitemap still lists the page URLs (for SEO, even if they 404 for now)
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${sitemapUrls.map(url => `
@@ -66,4 +73,5 @@ ${sitemapUrls.map(url => `
 
 fs.writeFileSync(SITEMAP_FILE, sitemap, 'utf8');
 
-console.log(`✅ Updated index.html (latest 1000 links) and sitemap.xml (${sitemapUrls.length} URLs).`);
+console.log(`✅ Updated index.html (all links go to /booking.com/).`);
+console.log(`✅ Sitemap.xml contains ${sitemapUrls.length} hotel page URLs.`);
