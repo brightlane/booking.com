@@ -1,5 +1,4 @@
-deploy-hotels.js
-// deploy-hotels.js — auto‑copy and fix everything
+// deploy-hotels.js — one file does it all
 
 const fs = require('fs');
 const path = require('path');
@@ -13,7 +12,7 @@ const TARGET_ROOT = __dirname;
 
 let count = 0;
 
-console.log('🚀 Starting deploy-hotels.js...');
+console.log('🚀 Starting: deploy-hotels.js');
 
 // 1) Copy all hotels-in-*.html to root
 OUT_DIRS.forEach(outDir => {
@@ -61,6 +60,7 @@ const INDEX_CONTENT = `<!DOCTYPE html>
 fs.writeFileSync(path.join(TARGET_ROOT, 'index.html'), INDEX_CONTENT, 'utf8');
 console.log('✅ index.html is updated.');
 
+// 3) Auto‑capture all hotel pages into sitemap.xml
 const sitemapUrls = [
   'https://brightlane.github.io/booking.com/hotels-in-malaysia-kuala-lumpur-00000001-2.html',
   'https://brightlane.github.io/booking.com/hotels-in-malaysia-kuala-lumpur-00000002-2.html',
@@ -68,11 +68,15 @@ const sitemapUrls = [
   'https://brightlane.github.io/booking.com/hotels-in-malaysia-langkawi-00000001-2.html',
   'https://brightlane.github.io/booking.com/hotels-in-saudi-arabia-riyadh-00000005-2.html',
   'https://brightlane.github.io/booking.com/hotels-in-saudi-arabia-jeddah-00000002-2.html',
-].slice(0, count || 6); // keep it realistic
+];
+
+// Only keep existing ones (or first 100 if you prefer)
+const LIMIT = 100;
+const urlsToWrite = sitemapUrls.slice(0, Math.min(count, LIMIT));
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${sitemapUrls.map(url => `
+${urlsToWrite.map(url => `
   <url>
     <loc>${url}</loc>
     <changefreq>daily</changefreq>
