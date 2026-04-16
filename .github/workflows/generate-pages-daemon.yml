@@ -32,6 +32,10 @@ jobs:
         run: |
           npm install --save-dev fs-extra
 
+      - name: Ensure output directory exists
+        run: |
+          mkdir -p output
+
       - name: Run generate-pages-daemon for up to 6 hours
         run: |
           node generate-pages-daemon.js &
@@ -47,6 +51,14 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add output/ sitemap.xml
+
+          # Always add sitemap.xml
+          git add sitemap.xml
+
+          # Only add output/ if it exists and has files
+          if [ -d output ] && [ "$(ls -A output)" ]; then
+            git add output/
+          fi
+
           git commit -m "Autogenerate pages + sitemap (self‑trigger daemon)" || echo "No changes"
           git push origin main
