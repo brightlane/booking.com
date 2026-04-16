@@ -239,3 +239,22 @@ async function runDaemon() {
 runDaemon().catch((err) => {
   console.error("generate-pages-daemon.js error:", err);
 });
+      - name: Run generate-pages-daemon for up to 6 hours
+        run: |
+          node generate-pages-daemon.js &
+          DAEMON_PID=$!
+          echo "Started daemon with PID $DAEMON_PID"
+          timeout 355m /bin/bash -c 'wait $DAEMON_PID || true'
+          sleep 10
+
+      - name: Generate sitemap from generated pages
+        run: |
+          node generate-sitemap.js
+
+      - name: Commit and push
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add output/ sitemap.xml
+          git commit -m "Autogenerate pages + sitemap (self‑trigger daemon)" || echo "No changes"
+          git push origin main
