@@ -94,7 +94,7 @@ function renderPage(entry) {
     },
     "latitude": ${lat},
     "longitude": ${lng},
-    "url": "https://${city.toLowerCase().replace(" ", "-")}-hotel-${id}.example.com"
+    "url": "https://${city.toLowerCase().replace(/ /g, "-")}-hotel-${id}.example.com"
   }
   </script>
 
@@ -140,4 +140,3 @@ async function generatePages() {
 
 // Run this daily
 generatePages().catch(console.error);
-
