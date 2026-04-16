@@ -37,4 +37,4 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          npx pages-deploy --repo https://github.com/brightlane/booking.com.git --branch main --cname your-domain.com
+          echo "Deploying from main to GitHub Pages (no pages-deploy)"
