@@ -1,0 +1,63 @@
+[
+  {
+    "id": "1",
+    "name": "Hotel Example One",
+    "chain": "BigGlobalChain",
+    "brand": "BudgetWings",
+    "city": "New York City",
+    "country": "United States",
+    "lat": 40.7585,
+    "lng": -73.9834,
+    "subset_type": "city-center",
+    "tags": ["city-center","business","airport","family","all-inclusive","underwater"],
+    "is_popular": true,
+    "website": "https://www.bigglobalchain.com/example-one",
+    "booking_link": "https://www.booking.com/index.html?aid=1858279&ss=Hotel+Example+One+New+York+City",
+    "skyscanner_link": "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885&city=New+York+City",
+    "template": "hotels-in-city.html",
+    "languages_offered": [
+      "en","es","pt","de","fr","it","zh","ru","ar","ja"
+    ],
+    "description_en": "Hotel Example One in New York City offers comfortable rooms close to the city center and major attractions.",
+    "description_es": "Hotel Example One en Nueva York ofrece habitaciones cómodas cerca del centro y de las principales atracciones.",
+    "description_pt": "Hotel Example One em Nova Iorque oferece quartos confortáveis perto do centro e das principais atrações.",
+    "description_de": "Hotel Example One in New York City bietet komfortable Zimmer in der Nähe des Stadtzentrums und wichtiger Sehenswürdigkeiten.",
+    "description_fr": "Hotel Example One à New York City offre des chambres confortables à proximité du centre‑ville et des principales attractions.",
+    "description_it": "Hotel Example One a New York City offre camere confortevoli vicino al centro e alle principali attrazioni.",
+    "description_zh": "New York City的Hotel Example One 提供舒适的客房，靠近市中心和主要景点。",
+    "description_ru": "Отель Example One в Нью‑Йорке предлагает комфортабельные номера недалеко от центра и главных достопримечательностей.",
+    "description_ar": "يوفر فندق Example One في مدينة نيويورك غرفًا مريحة بالقرب من وسط المدينة والمعالم السياحية الرئيسية.",
+    "description_ja": "ニューヨーク市のHotel Example Oneは、街の中心部と主要観光地の近くにある快適な客室を提供しています。"
+  },
+  
+  {
+    "id": "2",
+    "name": "Apartments Example Two",
+    "chain": "ApartFamily",
+    "brand": "CityStay",
+    "city": "Barcelona",
+    "country": "Spain",
+    "lat": 41.3851,
+    "lng": 2.1734,
+    "subset_type": "apart-hotel",
+    "tags": ["apart-hotel","long-stay","kitchenettes","mid-range"],
+    "is_popular": true,
+    "website": "https://www.apartfamily.com/example-two",
+    "booking_link": "https://www.booking.com/index.html?aid=1858279&ss=Apartments+Example+Two+Barcelona",
+    "skyscanner_link": "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885&city=Barcelona",
+    "template": "apartments-in-city.html",
+    "languages_offered": [
+      "en","es","pt","de","fr","it","zh","ru","ar","ja"
+    ],
+    "description_en": "Apartments Example Two in Barcelona offers serviced apartments with kitchens, ideal for stays longer than a few nights.",
+    "description_es": "Apartments Example Two en Barcelona ofrece apartamentos con cocina, ideales para estancias de varios días.",
+    "description_pt": "Apartments Example Two em Barcelona oferece apartamentos com cozinha, ideais para estadias de vários dias.",
+    "description_de": "Apartments Example Two in Barcelona bietet Wohnungen mit Küche, ideal für längere Aufenthalte.",
+    "description_fr": "Apartments Example Two à Barcelone propose des appartements avec cuisine, parfaits pour des séjours de plusieurs nuits.",
+    "description_it": "Apartments Example Two a Barcellona offre appartamenti con cucina, ideali per soggiorni di più notti.",
+    "description_zh": "巴塞罗那的Apartments Example Two提供带厨房的服务式公寓，适合过夜住宿。",
+    "description_ru": "Квартиры Example Two в Барселоне предлагают апартаменты с кухней, идеально подходящие для длительных поездок.",
+    "description_ar": "توفر شقق Example Two في برشلونة شققًا مع مطبخ، مثالية لإقامة تزيد عن بضعة أيام.",
+    "description_ja": "バルセロナのApartments Example Twoはキッチン付きのアパートを提供し、数泊以上の滞在に最適です。"
+  }
+]
