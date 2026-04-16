@@ -19,6 +19,7 @@
 
   function makePopup() {
     if (document.getElementById('exit-pop-overlay')) return;
+
     const overlay = document.createElement('div');
     overlay.id = 'exit-pop-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:999999;padding:20px;';
@@ -33,9 +34,11 @@
         </div>
       </div>`;
     document.body.appendChild(overlay);
+
     const close = () => overlay.style.display = 'none';
     document.getElementById('exit-pop-close').addEventListener('click', close);
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
     let shown = false;
     document.addEventListener('mouseout', e => {
       if (shown) return;
@@ -46,7 +49,11 @@
     });
   }
 
-  function init() { checkLinks(); makePopup(); }
+  function init() {
+    checkLinks();
+    makePopup();
+  }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
