@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <title>HotelInDeals — 1B+ Hotel Guides, Real‑Time Deals | 2026</title>
-  <meta name="description" content="Find the best hotels in, hotels near, apartments, resorts, villas, B&amp;Bs, and guesthouses worldwide in 2026. Use Booking.com and Skyscanner to compare and book instantly.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="language" content="en">
-  <meta name="robots" content="index, follow">
+  <meta name="description" content="Find the best hotels in, hotels near, apartments, resorts, villas, B&amp;Bs, and guesthouses worldwide in 2026. Use Booking.com and Skyscanner to compare and book instantly." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="language" content="en" />
+  <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://brightlane.github.io/booking.com/" />
   <link rel="sitemap" href="https://brightlane.github.io/booking.com/sitemap.xml" />
   <link rel="robots" href="https://brightlane.github.io/booking.com/robots.txt" />
@@ -37,8 +37,32 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
       line-height: 1.6;
-      background-color: var(--bc-bg);
+      background: var(--bc-bg);
       color: #333;
+    }
+
+    /* Make top half clickable (whole hero + search + first row of tiles)
+       without breaking links inside */
+    .clickable-zone {
+      position: relative;
+      cursor: pointer;
+    }
+    .clickable-zone::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+    .clickable-zone a,
+    .clickable-zone button,
+    .clickable-zone input,
+    .clickable-zone select,
+    .clickable-zone label {
+      z-index: 2;
+      position: relative;
     }
 
     /* Navbar (Booking‑com style) */
@@ -49,6 +73,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
+      z-index: 5;
     }
     .navbar a {
       color: white;
@@ -66,6 +92,7 @@
       color: white;
       padding: 4rem 0 3rem;
       text-align: center;
+      position: relative;
     }
     .hero h1 {
       font-size: 2.5rem;
@@ -86,6 +113,7 @@
       padding: 1.5rem;
       background-color: var(--bc-blue);
       border-radius: 8px;
+      position: relative;
     }
     .search-box label {
       display: block;
@@ -121,7 +149,7 @@
       background-color: #f5a900;
     }
 
-    /* Hub‑style tiles (Bootstrap grid feel, but without Bootstrap CSS) */
+    /* Hub‑style tiles (Booking‑com colors, easy to read) */
     .container {
       max-width: 1140px;
       margin: 0 auto;
@@ -142,6 +170,7 @@
       border-radius: 12px;
       box-shadow: var(--bc-shadow);
       padding: 1.5rem;
+      position: relative;
     }
     .card-fancy:hover {
       box-shadow: 0 8px 24px rgba(0,0,0,0.15);
@@ -149,6 +178,9 @@
     .card-fancy h3 {
       margin-top: 0;
       color: var(--bc-blue);
+    }
+    .card-fancy p {
+      margin: 0.6rem 0 0.8rem;
     }
     .card-fancy a {
       color: var(--bc-blue);
@@ -170,6 +202,7 @@
     h2 {
       color: var(--bc-blue);
       margin-top: 3rem;
+      font-size: 1.35rem;
     }
     hr {
       border: 1px solid #ddd;
@@ -263,133 +296,140 @@
   </div>
 </nav>
 
-<!-- Hero / Booking‑style landing -->
-<section class="hero">
-  <h1>HotelInDeals — 1B+ Hotel Guides, Real‑Time Deals (2026)</h1>
-  <p>
-    Search for <strong>hotels in [city]</strong>, <strong>hotels near [place]</strong>, <strong>apartments</strong>,
-    <strong>resorts</strong>, <strong>villas</strong>, <strong>bed and breakfasts</strong>, and <strong>guesthouses</strong>
-    worldwide. Each page shows Booking.com deals and flight comparison links via Skyscanner.
-  </p>
-  <p>
-    Our site automatically generates over a billion high‑quality hotel pages,
-    each with targeted keywords for “hotel in [city]”, “hotels in [city]”, “hotel near airport in [city]”, and more.
-  </p>
-</section>
+<!-- Top‑half of page is now clickable zone -->
+<div class="clickable-zone"
+     onclick="window.open(pickBooking(), '_blank');">
+  <!-- Hero / Booking‑style landing -->
+  <section class="hero">
+    <h1>HotelInDeals — 1B+ Hotel Guides, Real‑Time Deals (2026)</h1>
+    <p>
+      Search for <strong>hotels in [city]</strong>, <strong>hotels near [place]</strong>, <strong>apartments</strong>,
+      <strong>resorts</strong>, <strong>villas</strong>, <strong>bed and breakfasts</strong>, and <strong>guesthouses</strong>
+      worldwide. Each page shows Booking.com deals and flight comparison links via Skyscanner.
+    </p>
+    <p>
+      Our site automatically generates over a billion high‑quality hotel pages,
+      each with targeted keywords for “hotel in [city]”, “hotels in [city]”, “hotel near airport in [city]”, and more.
+    </p>
+  </section>
 
-<!-- Booking‑style search box -->
+  <!-- Booking‑style search box (still clickable within top‑half) -->
+  <div class="container">
+    <div class="search-box">
+      <form
+        action="https://www.booking.com/searchresults.html"
+        method="GET"
+        target="_blank"
+      >
+        <div class="search-form">
+          <input type="hidden" name="aid" value="8132800" />
+          <div style="flex: 3;">
+            <label for="ss">Where to?</label>
+            <input type="text" id="ss" name="ss" placeholder="City, landmark, hotel name" />
+          </div>
+          <div style="flex: 1;">
+            <label for="checkin">Check‑in</label>
+            <input type="date" id="checkin" name="checkin" />
+          </div>
+          <div style="flex: 1;">
+            <label for="checkout">Check‑out</label>
+            <input type="date" id="checkout" name="checkout" />
+          </div>
+          <div style="flex: 0.7;">
+            <label for="group_adults">Adults</label>
+            <select id="group_adults" name="group_adults">
+              <option value="1">1 adult</option>
+              <option value="2" selected>2 adults</option>
+              <option value="3">3 adults</option>
+              <option value="4">4 adults</option>
+            </select>
+          </div>
+          <div style="flex: 0.7;">
+            <label for="group_children">Children</label>
+            <select id="group_children" name="group_children">
+              <option value="0" selected>0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+          <button type="submit">Search</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Main tiles (HotelInDeals structure, more Booking‑com‑like and readable) -->
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="card-fancy">
+          <h3>Hotels in [City]</h3>
+          <p>
+            When people search for “hotel in [city]” or “hotels in [city]”, HotelInDeals generates
+            a dedicated page for that city and keyword pattern.
+          </p>
+          <p>
+            Example hub cities:
+          </p>
+          <p>
+            <a href="/hotels-in-london.html" class="hub-link">Hotels in London</a> |
+            <a href="/hotels-in-paris.html" class="hub-link">Hotels in Paris</a> |
+            <a href="/hotels-in-rome.html" class="hub-link">Hotels in Rome</a> |
+            <a href="/hotels-in-tokyo.html" class="hub-link">Hotels in Tokyo</a> |
+            <a href="/hotels-in-new-york-city.html" class="hub-link">Hotels in New York City</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card-fancy">
+          <h3>Hotels near [Place]</h3>
+          <p>
+            For searches like “hotels near airport in [city]” or “hotel near downtown in [city]”,
+            HotelInDeals generates unique pages showing Booking.com results and flight comparison links.
+          </p>
+          <p>
+            Example pattern links:
+          </p>
+          <p>
+            <a href="/hotels-near-airport-in-london.html" class="hub-link">Hotels near airport in London</a><br>
+            <a href="/hotels-near-downtown-in-paris.html" class="hub-link">Hotels near downtown in Paris</a><br>
+            <a href="/hotel-near-beach-in-tokyo.html" class="hub-link">Hotel near beach in Tokyo</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card-fancy">
+          <h3>Landing types</h3>
+          <p>
+            Each page randomly intermingles the following Booking.com landing‑types with
+            <strong>aid=8132800 (GitHub)</strong>:
+          </p>
+          <ul>
+            <li><a href="https://www.booking.com/index.html?aid=8132800" target="_blank">
+              Home page</a></li>
+            <li><a href="https://www.booking.com/apartments/index.html?aid=8132800" target="_blank">
+              Apartments</a></li>
+            <li><a href="https://www.booking.com/resorts/index.html?aid=8132800" target="_blank">
+              Resorts</a></li>
+            <li><a href="https://www.booking.com/villas/index.html?aid=8132800" target="_blank">
+              Villas</a></li>
+            <li><a href="https://www.booking.com/bed-and-breakfast/index.html?aid=8132800" target="_blank">
+              Bed and breakfasts (B&amp;Bs)</a></li>
+            <li><a href="https://www.booking.com/guest-house/index.html?aid=8132800" target="_blank">
+              Guesthouses</a></li>
+          </ul>
+          <p>
+            All links are preserved exactly and never mutated through the generator stack.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- How‑to section (below the clickable top‑half) -->
 <div class="container">
-  <div class="search-box">
-    <form
-      action="https://www.booking.com/searchresults.html"
-      method="GET"
-      target="_blank"
-    >
-      <div class="search-form">
-        <input type="hidden" name="aid" value="8132800" />
-        <div style="flex: 3;">
-          <label for="ss">Where to?</label>
-          <input type="text" id="ss" name="ss" placeholder="City, landmark, hotel name" />
-        </div>
-        <div style="flex: 1;">
-          <label for="checkin">Check‑in</label>
-          <input type="date" id="checkin" name="checkin" />
-        </div>
-        <div style="flex: 1;">
-          <label for="checkout">Check‑out</label>
-          <input type="date" id="checkout" name="checkout" />
-        </div>
-        <div style="flex: 0.7;">
-          <label for="group_adults">Adults</label>
-          <select id="group_adults" name="group_adults">
-            <option value="1">1 adult</option>
-            <option value="2" selected>2 adults</option>
-            <option value="3">3 adults</option>
-            <option value="4">4 adults</option>
-          </select>
-        </div>
-        <div style="flex: 0.7;">
-          <label for="group_children">Children</label>
-          <select id="group_children" name="group_children">
-            <option value="0" selected>0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
-        </div>
-        <button type="submit">Search</button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Main tiles (HotelInDeals structure, just more Booking‑style colors) -->
-  <div class="row">
-    <div class="col-lg-4">
-      <div class="card-fancy">
-        <h3>Hotels in [City]</h3>
-        <p>
-          When people search for “hotel in [city]” or “hotels in [city]”, HotelInDeals generates
-          a dedicated page for that city and keyword pattern.
-        </p>
-        <p>
-          Example hub cities:
-        </p>
-        <p>
-          <a href="/hotels-in-london.html" class="hub-link">Hotels in London</a> |
-          <a href="/hotels-in-paris.html" class="hub-link">Hotels in Paris</a> |
-          <a href="/hotels-in-rome.html" class="hub-link">Hotels in Rome</a> |
-          <a href="/hotels-in-tokyo.html" class="hub-link">Hotels in Tokyo</a> |
-          <a href="/hotels-in-new-york-city.html" class="hub-link">Hotels in New York City</a>
-        </p>
-      </div>
-    </div>
-
-    <div class="col-lg-4">
-      <div class="card-fancy">
-        <h3>Hotels near [Place]</h3>
-        <p>
-          For searches like “hotels near airport in [city]” or “hotel near downtown in [city]”,
-          HotelInDeals generates unique pages showing Booking.com results and flight comparison links.
-        </p>
-        <p>
-          Example pattern links:
-        </p>
-        <p>
-          <a href="/hotels-near-airport-in-london.html" class="hub-link">Hotels near airport in London</a><br>
-          <a href="/hotels-near-downtown-in-paris.html" class="hub-link">Hotels near downtown in Paris</a><br>
-          <a href="/hotel-near-beach-in-tokyo.html" class="hub-link">Hotel near beach in Tokyo</a>
-        </p>
-      </div>
-    </div>
-
-    <div class="col-lg-4">
-      <div class="card-fancy">
-        <h3>Landing types</h3>
-        <p>
-          Each page randomly intermingles the following Booking.com landing‑types with
-          <strong>aid=8132800 (GitHub)</strong>:
-        </p>
-        <ul>
-          <li><a href="https://www.booking.com/index.html?aid=8132800" target="_blank">
-            Home page</a></li>
-          <li><a href="https://www.booking.com/apartments/index.html?aid=8132800" target="_blank">
-            Apartments</a></li>
-          <li><a href="https://www.booking.com/resorts/index.html?aid=8132800" target="_blank">
-            Resorts</a></li>
-          <li><a href="https://www.booking.com/villas/index.html?aid=8132800" target="_blank">
-            Villas</a></li>
-          <li><a href="https://www.booking.com/bed-and-breakfast/index.html?aid=8132800" target="_blank">
-            Bed and breakfasts (B&amp;Bs)</a></li>
-          <li><a href="https://www.booking.com/guest-house/index.html?aid=8132800" target="_blank">
-            Guesthouses</a></li>
-        </ul>
-        <p>
-          All links are preserved exactly and never mutated through the generator stack.
-        </p>
-      </div>
-    </div>
-  </div>
-
   <hr>
   <h2>How to use this site</h2>
   <p>
@@ -403,95 +443,4 @@
     <li>Use the Skyscanner button on each page to compare flights to the destination.</li>
   </ol>
 
-  <hr>
-  <h2>Skyscanner integration</h2>
-  <p>
-    Every page intermingles a Skyscanner flight comparison URL with your affiliate ID,
-    so visitors can easily compare flights to the destination city.
-  </p>
-  <div class="sky-block">
-    <p>
-      Example global link:
-      <a href="https://convert.ctypy.com/aff_c?offer_id=29465&amp;aff_id=21885" target="_blank">
-        Skyscanner flight search
-      </a>
-    </p>
-  </div>
-</div>
-
-<!-- Sticky booking bar -->
-<div class="sticky-booking-bar">
-  <div class="container text-center">
-    <p class="mb-2">
-      Book your stay or compare flights in one click, from anywhere on the site:
-    </p>
-    <a href="#" id="bookingBtn" class="btn btn-primary mx-2"
-       onclick="window.open(pickBooking(), '_blank'); return false;">
-      Book on Booking.com (aid=8132800, GitHub)
-    </a>
-    <a href="#" id="skyscannerBtn" class="
-             class="btn btn-outline-light mx-2"
-       onclick="window.open(pickSky(), '_blank'); return false;">
-      Compare flights (Skyscanner)
-    </a>
-  </div>
-</div>
-
-<!-- Footer (HotelInDeals + Booking‑style colors) -->
-<footer class="footer text-center">
-  <div class="container">
-    <p class="mb-2">
-      HotelInDeals – 1B+ Hotel Guides Worldwide – 2026
-    </p>
-    <p class="mb-2">
-      This site is automatically generated from
-      <a href="https://github.com/brightlane/booking.com" target="_blank">
-        GitHub
-      </a>
-      and publishes over a billion dynamically generated hotel‑in and hotel‑near pages.
-    </p>
-    <p class="mb-0">
-      © 2026
-      <a href="https://brightlane.github.io/">brightlane</a>
-      — all rights reserved.
-    </p>
-  </div>
-</footer>
-
-<!-- Affiliate helpers script (keep exactly as you had it) -->
-<script>
-// Your 6 Booking.com URLs (all with aid=8132800) + Skyscanner main URL
-const BOOKING = {
-  HOME: "https://www.booking.com/index.html?aid=8132800",
-  APARTMENTS: "https://www.booking.com/apartments/index.html?aid=8132800",
-  RESORTS: "https://www.booking.com/resorts/index.html?aid=8132800",
-  VILLAS: "https://www.booking.com/villas/index.html?aid=8132800",
-  BNB: "https://www.booking.com/bed-and-breakfast/index.html?aid=8132800",
-  GUESTHOUSES: "https://www.booking.com/guest-house/index.html?aid=8132800",
-};
-
-const SKY = {
-  MAIN: "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885",
-};
-
-// Randomly pick one of the 6 Booking.com URLs (cross‑links via rotation, not by hand)
-function pickBooking() {
-  const options = [
-    BOOKING.HOME,
-    BOOKING.APARTMENTS,
-    BOOKING.RESORTS,
-    BOOKING.VILLAS,
-    BOOKING.BNB,
-    BOOKING.GUESTHOUSES,
-  ];
-  return options[Math.floor(Math.random() * options.length)];
-}
-
-// Pick Skyscanner URL (always the same unless you add more)
-function pickSky() {
-  return SKY.MAIN;
-}
-</script>
-
-</body>
-</html>
+ 
