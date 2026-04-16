@@ -1,3 +1,4 @@
+// generator-loop.js
 require('dotenv').config();
 
 const fs = require('fs');
@@ -38,55 +39,9 @@ function pickSky() {
   return SKY.MAIN;
 }
 
-const AI_KEYS = {
-  ai1: process.env.AI1_KEY,
-  ai2: process.env.AI2_KEY,
-  ai3: process.env.AI3_KEY,
-  ai4: process.env.AI4_KEY,
-  endpoint1: 'https://api.ai-provider-1.com/v1/chat',
-  endpoint2: 'https://api.ai-provider-2.com/v1/completions',
-  endpoint3: 'https://api.ai-provider-3.com/v1/chat',
-  endpoint4: 'https://api.ai-provider-4.com/v1/completions',
-};
-
-const MAX_PAGES = 10_000_000;          // or set smaller for testing
-const MAX_CHARS_PER_PAGE = 30_000;     // ~5k–6k words
-const RETRY_MS = 60_000;               // back‑off if AI quota hit
-
-let cities = [];
-let seenSlugs = new Set();
-let pageCounter = 0;
-let lastErrorTime = 0;
-let lastPageTimestamp = 0;
-
-fs.mkdirSync(OUT_DIR, { recursive: true });
-
-function loadCities() {
-  cities = JSON.parse(fs.readFileSync(CITIES_PATH, 'utf8'));
-  console.log(`✅ Loaded ${cities.length} cities.`);
-}
-
-function loadSeenSlugs() {
-  const file = path.join(OUT_DIR, 'generated-slugs.txt');
-  if (fs.existsSync(file)) {
-    const list = fs.readFileSync(file, 'utf8').trim().split('\n');
-    seenSlugs = new Set(list);
-  }
-}
-
-function markGenerated(slug) {
-  seenSlugs.add(slug);
-  const file = path.join(OUT_DIR, 'generated-slugs.txt');
-  fs.writeFileSync(file, [...seenSlugs].join('\n'));
-}
-
-function generateSlug(city, country, id) {
-  return `${country}-${city.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${id.toString().padStart(8, '0')}`;
-}
-
+// Minimal 5k‑word‑style content (you can plug real AI later)
 function generateContentStable(city, country, slug) {
   const keyword = `hotels in ${city} ${country} 2026`;
-
   return `
 <p>
   <strong>Ultimate guide to hotels in ${city}, ${country} – 2026 Edition.</strong>
@@ -94,23 +49,17 @@ function generateContentStable(city, country, slug) {
 
 <p>
   Every page on Hotel Deals. leads you to a Booking.com link with aid=${BOOKING_AID}
-  to help you save on every stay. In this guide, you’ll find the best hotels in ${city},
+  to help you save on every stay. Use this page to find the best hotels in ${city},
   hotels near ${city}, apartments, resorts, villas, and B&amp;Bs on Booking.com.
-</p>
-
-<p>
-  From luxury five‑star hotels to budget‑friendly stays, our guide helps you pick the
-  perfect area and type of accommodation for your trip. Use our Booking.com search
-  box below to instantly compare prices and book your stay.
 </p>
 
 <p>
   For your flights, use Skyscanner to compare prices before you arrive.
 </p>
 
-<!-- This is your minimal 5k‑word‑style placeholder,
-     but you can plug the real AI calls back in the same structure
-     if you want fully AI‑generated content every second -->
+<p>
+  And more SEO‑style text would go here if you enable real AI calls.
+</p>
 `;
 }
 
@@ -195,53 +144,66 @@ function generatePageHtml(city, country, slug) {
 </html>`;
 }
 
+// Settings for GitHub Actions (don't run forever, but loop for 10–15 minutes)
+const MAX_PAGES_PER_RUN = 500;
+const MAX_CHARS_PER_PAGE = 30_000;
+
+let cities = [];
+let pageCounterThisRun = 0;
+let totalPageCount = 0;
+
+fs.mkdirSync(OUT_DIR, { recursive: true });
+
+if (fs.existsSync(CITIES_PATH)) {
+  cities = JSON.parse(fs.readFileSync(CITIES_PATH, 'utf8'));
+  console.log(`✅ Loaded ${cities.length} cities.`);
+} else {
+  console.log(`⚠️  No cities.json found; using dummy.`);
+  cities = [
+    { city: "Kuala Lumpur", country: "Malaysia" },
+    { city: "Langkawi", country: "Malaysia" },
+    { city: "Riyadh", country: "Saudi Arabia" },
+    { city: "Jeddah", country: "Saudi Arabia" },
+    { city: "Singapore", country: "Singapore" },
+  ];
+}
+
+function generateSlug(city, country, id) {
+  return `${country.toLowerCase()}-${city.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${id.toString().padStart(8, '0')}`;
+}
+
 function generateOnePage() {
-  if (pageCounter >= MAX_PAGES) {
-    console.log(`✅ Reached limit ${MAX_PAGES}, stopping generator.`);
-    return;
+  if (pageCounterThisRun >= MAX_PAGES_PER_RUN) {
+    return false;
   }
 
-  const now = Date.now();
   const cityItem = cities[Math.floor(Math.random() * cities.length)];
   const { city, country } = cityItem;
-  const slug = generateSlug(city, country, pageCounter + 1);
+  const slug = generateSlug(city, country, totalPageCount + 1);
 
-  if (seenSlugs.has(slug)) {
-    console.log(`🔁 Already generated: ${slug}`);
-    return;
-  }
+  const html = generatePageHtml(city, country, slug);
+  const filepath = path.join(OUT_DIR, `hotels-in-${slug}.html`);
+  fs.writeFileSync(filepath, html, 'utf8');
 
-  try {
-    const html = generatePageHtml(city, country, slug);
-    const filepath = path.join(OUT_DIR, `hotels-in-${slug}.html`);
-    fs.writeFileSync(filepath, html, 'utf8');
-    pageCounter += 1;
-    markGenerated(slug);
-    console.log(`✅ Generated ${pageCounter}: ${slug}`);
-    lastPageTimestamp = now;
-  } catch (err) {
-    console.error(`❌ Generate failed: ${err.message}`);
-    lastErrorTime = now;
-  }
+  pageCounterThisRun += 1;
+  totalPageCount += 1;
+
+  console.log(`✅ [${new Date().toISOString()}] Generated ${totalPageCount}: ${slug}`);
+  return true;
 }
 
 function loopTick() {
-  try {
-    generateOnePage();
-  } catch (err) {
-    console.error(`Tick failed: ${err.message}`);
-    lastErrorTime = Date.now();
+  const keepGoing = generateOnePage();
+  if (!keepGoing) {
+    console.log(`⛔ Reached limit ${MAX_PAGES_PER_RUN} for this run.`);
+    return;
   }
 
-  const delayMs = 1_000; // 1 second
-  setTimeout(loopTick, delayMs);
+  const delayMs = 1_500;
+  setTimeout(() => {
+    setImmediate(loopTick);
+  }, delayMs);
 }
 
-function startGenerator() {
-  console.log(`🚀 Starting 24/7 hotel content generator (1 page per second if possible)...`);
-  loadCities();
-  loadSeenSlugs();
-  loopTick();
-}
-
-startGenerator();
+console.log(`🚀 Hotel Deals generator started (output/).`);
+loopTick();
