@@ -30,10 +30,13 @@ jobs:
       - name: Update index.html with new pages
         run: node update-index.js
 
+      - name: Deploy and fix all hotel pages (one file does it all)
+        run: node deploy-hotels.js
+
       - name: Commit output and index.html
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           git add -A .
-          git commit -m "Auto‑gen hotels + update index: $(date)" || echo "No changes"
+          git commit -m "Auto‑gen + deploy hotels: $(date)" || echo "No changes"
           git push
