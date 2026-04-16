@@ -1,5 +1,6 @@
 // generate-site-and-sitemap.js
-// Correctly writes hotel pages into ./output/ + builds sitemap.xml
+// Generates hotel pages + sitemap
+// Booking.com (aid=8132800) + Skyscanner (https://convert.ctypy.com/aff_c...)
 
 const fs   = require("fs-extra");
 const path = require("path");
@@ -8,7 +9,7 @@ const OUTPUT_DIR   = path.resolve("./output");
 const SITEMAP_FILE = path.resolve("sitemap.xml");
 const BASE_URL     = "https://brightlane.github.io/booking.com/";
 
-// Your exact Booking.com affiliate URLs
+// Your Booking.com affiliate URLs (aid=8132800)
 const BOOKING_COM_LINKS = {
   hotels: "https://www.booking.com/index.html?aid=8132800",
   apartments: "https://www.booking.com/apartments/index.html?aid=8132800",
@@ -17,6 +18,9 @@ const BOOKING_COM_LINKS = {
   "bed-and-breakfast": "https://www.booking.com/bed-and-breakfast/index.html?aid=8132800",
   "guest-house": "https://www.booking.com/guest-house/index.html?aid=8132800",
 };
+
+// Your Skyscanner travel‑link (use on hotel pages for flight search)
+const SKYSCANNER_URL = "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885";
 
 // Replace this with your real hotel data later
 const hotels = [
@@ -34,7 +38,7 @@ async function ensureOutputDir() {
   console.log("✅ OUTPUT_DIR:", OUTPUT_DIR);
 }
 
-// Generate one HTML page
+// Generate one HTML page with both Booking.com and Skyscanner links
 function generateHtml(id, city, slug) {
   const hotelLink        = `https://www.booking.com/hotel/${city}/${slug}.html?aid=8132800`;
   const apartmentsLink   = BOOKING_COM_LINKS.apartments;
@@ -48,8 +52,9 @@ function generateHtml(id, city, slug) {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>${city} - ${slug} - Booking.com Affiliate Page</title>
+  <title>${city} - ${slug} - Booking.com + Skyscanner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Tiny tracking image that hits Booking.com with your aid=8132800 -->
   <script>
     (function() {
       const img = new Image();
@@ -64,7 +69,7 @@ function generateHtml(id, city, slug) {
 
   <hr>
 
-  <h2>Booking.com category pages (your exact URLs)</h2>
+  <h2>🏨 Booking.com links (aid=8132800)</h2>
   <ul>
     <li><a href="${hotelsLink}" target="_blank" rel="noopener noreferrer">Hotels homepage</a></li>
     <li><a href="${apartmentsLink}" target="_blank" rel="noopener noreferrer">Apartments</a></li>
@@ -74,16 +79,24 @@ function generateHtml(id, city, slug) {
     <li><a href="${guesthouseLink}" target="_blank" rel="noopener noreferrer">Guesthouses</a></li>
   </ul>
 
-  <hr>
-
   <p>
     <a href="${hotelLink}" target="_blank" rel="noopener noreferrer">
       Book this hotel on Booking.com
     </a>
   </p>
 
+  <hr>
+
+  <h2>✈️ Flights with Skyscanner (your affiliate URL)</h2>
+  <p>
+    Looking for flights to ${city}?<br>
+    <a href="${SKYSCANNER_URL}" target="_blank" rel="noopener noreferrer">
+      Search flights on Skyscanner
+    </a>
+  </p>
+
   <p style="font-size:12px;color:#888;">
-    Booking.com affiliate ID: 8132800
+    Booking.com aid: 8132800 • Skyscanner URL: ${SKYSCANNER_URL}
   </p>
 </body>
 </html>`;
