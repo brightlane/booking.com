@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install --save-dev fs-extra
+          npm install
 
       - name: Ensure output directory exists
         run: |
