@@ -1,8 +1,9 @@
 name: Generate pages daemon (long‑run)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # Let you click "Run workflow"
   schedule:
+    # Run once per day at 2 AM UTC (change as you like)
     - cron: "0 2 * * *"
 
 jobs:
@@ -10,10 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: "--max-old-space-size=8192"
+    # Maximum run time: 360 minutes (6 hours)
     timeout-minutes: 360
 
     steps:
-      - uses: actions/checkout@v4   # ← remove "with: { token: ... }"
+      - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -22,7 +24,7 @@ jobs:
 
       - name: Install deps
         run: |
-          npm install fs-extra
+          npm install fs-extra chokidar
 
       - name: Ensure output dir
         run: |
