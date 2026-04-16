@@ -1,0 +1,13 @@
+{
+  "name": "brightlane-booking",
+  "version": "1.0.0",
+  "description": "Global hotel booking SEO site",
+  "main": "index.html",
+  "scripts": {
+    "build": "node generate-site-files.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "private": true
+}
