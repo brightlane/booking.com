@@ -2,9 +2,11 @@ name: Build and deploy GitHub Pages site
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: read
@@ -12,7 +14,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
@@ -22,19 +24,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: 24
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci || npm install
 
-      - name: Run site builder
+      - name: Build site
         run: node build-site.js
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Generate sitemap
+        run: node generate-sitemap.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
