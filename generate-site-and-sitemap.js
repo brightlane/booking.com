@@ -1,7 +1,5 @@
 // generate-site-and-sitemap.js
-// Generates hotel pages + sitemap
-// Booking.com (aid=8132800) + Skyscanner (https://convert.ctypy.com/aff_c...)
-
+// Generates hotel pages into ./output/ AND builds sitemap.xml
 const fs   = require("fs-extra");
 const path = require("path");
 
@@ -9,7 +7,7 @@ const OUTPUT_DIR   = path.resolve("./output");
 const SITEMAP_FILE = path.resolve("sitemap.xml");
 const BASE_URL     = "https://brightlane.github.io/booking.com/";
 
-// Your Booking.com affiliate URLs (aid=8132800)
+// Your Booking.com affiliate URLs
 const BOOKING_COM_LINKS = {
   hotels: "https://www.booking.com/index.html?aid=8132800",
   apartments: "https://www.booking.com/apartments/index.html?aid=8132800",
@@ -19,10 +17,7 @@ const BOOKING_COM_LINKS = {
   "guest-house": "https://www.booking.com/guest-house/index.html?aid=8132800",
 };
 
-// Your Skyscanner travel‑link (use on hotel pages for flight search)
-const SKYSCANNER_URL = "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885";
-
-// Replace this with your real hotel data later
+// Replace this with your real hotel‑data array later
 const hotels = [
   { id: "ht-1000000", city: "paris",      slug: "hotel-deluxe-paris" },
   { id: "ht-1000001", city: "rome",       slug: "rome-luxury-hotel" },
@@ -32,13 +27,14 @@ const hotels = [
   { id: "ht-1000005", city: "tokyo",      slug: "tokyo-skyline-hotel" },
 ];
 
-// Make sure ./output/ exists
+// Skyscanner affiliate URL
+const SKYSCANNER_URL = "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885";
+
 async function ensureOutputDir() {
   await fs.ensureDir(OUTPUT_DIR);
   console.log("✅ OUTPUT_DIR:", OUTPUT_DIR);
 }
 
-// Generate one HTML page with both Booking.com and Skyscanner links
 function generateHtml(id, city, slug) {
   const hotelLink        = `https://www.booking.com/hotel/${city}/${slug}.html?aid=8132800`;
   const apartmentsLink   = BOOKING_COM_LINKS.apartments;
@@ -52,13 +48,12 @@ function generateHtml(id, city, slug) {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>${city} - ${slug} - Booking.com + Skyscanner</title>
+  <title>${city} - ${slug} - Booking.com Affiliate Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Tiny tracking image that hits Booking.com with your aid=8132800 -->
   <script>
     (function() {
       const img = new Image();
-      img.src = "https://images.booking.com/pixel?aid=8132800&ts=" + Date.now();
+      img.src = "https://images.booking.com/pixel?aid=8132800&amp;ts=" + Date.now();
     })();
   </script>
 </head>
@@ -69,64 +64,54 @@ function generateHtml(id, city, slug) {
 
   <hr>
 
-  <h2>🏨 Booking.com links (aid=8132800)</h2>
+  <h2>_booking.com_links_(aid=8132800)</h2>
   <ul>
-    <li><a href="${hotelsLink}" target="_blank" rel="noopener noreferrer">Hotels homepage</a></li>
-    <li><a href="${apartmentsLink}" target="_blank" rel="noopener noreferrer">Apartments</a></li>
-    <li><a href="${resortsLink}" target="_blank" rel="noopener noreferrer">Resorts</a></li>
-    <li><a href="${villasLink}" target="_blank" rel="noopener noreferrer">Villas</a></li>
-    <li><a href="${bedbreakfastLink}" target="_blank" rel="noopener noreferrer">Bed &amp; Breakfast</a></li>
-    <li><a href="${guesthouseLink}" target="_blank" rel="noopener noreferrer">Guesthouses</a></li>
+    ><a href="${hotelsLink}" target="_blank" rel="noopener noreferrer">Hotels homepage</a></li>
+    ><a href="${apartmentsLink}" target="_blank" rel="noopener noreferrer">Apartments</a></li>
+    ><a href="${resortsLink}" target="_blank" rel="noopener noreferrer">Resorts</a></li>
+    ><a href="${villasLink}" target="_blank" rel="noopener noreferrer">Villas</a></li>
+    ><a href="${bedbreakfastLink}" target="_blank" rel="noopener noreferrer">Bed &amp; Breakfast</a></li>
+    ><a href="${guesthouseLink}" target="_blank" rel="noopener noreferrer">Guesthouses</a></li>
   </ul>
 
-  <p>
-    <a href="${hotelLink}" target="_blank" rel="noopener noreferrer">
-      Book this hotel on Booking.com
-    </a>
-  </p>
+  <p><a href="${hotelLink}" target="_blank" rel="noopener noreferrer">Book this hotel on Booking.com</a></p>
 
-  <hr>
-
-  <h2>✈️ Flights with Skyscanner (your affiliate URL)</h2>
+  <h2>✈️ Skyscanner search</h2>
   <p>
-    Looking for flights to ${city}?<br>
     <a href="${SKYSCANNER_URL}" target="_blank" rel="noopener noreferrer">
-      Search flights on Skyscanner
+      Search flights
     </a>
   </p>
 
   <p style="font-size:12px;color:#888;">
-    Booking.com aid: 8132800 • Skyscanner URL: ${SKYSCANNER_URL}
+    Booking.com affiliate ID: 8132800
   </p>
 </body>
 </html>`;
 }
 
-// Build sitemap.xml from all URLs
 async function buildSitemap(urls) {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
-  .map((loc) => `  <url><loc>${loc.replace(/&/g, "&amp;")}</loc></url>`)
+  .map((loc) => `  <url>oc>${loc.replace(/&/g, "&amp;")}</loc></url>`)
   .join("\n")}
 </urlset>
 `;
-
   await fs.writeFile(SITEMAP_FILE, xml);
   console.log("✅ Sitemap written: %d URLs", urls.length);
 }
 
-// Main entrypoint
 async function main() {
   try {
     await ensureOutputDir();
 
     const pageUrls = [];
 
-    console.log("Generating hotel pages into %s...", OUTPUT_DIR);
+    console.log("Generating test hotel pages into %s...", OUTPUT_DIR);
     for (const { id, city, slug } of hotels) {
       const filename = `${id}-${slug}.html`;
-      const filepath = path.join(OUTPUT_DIR, filename);
+      const filepath = path.join(OUTPUT_DIR, filename); // This line writes to ./output/
       const html = generateHtml(id, city, slug);
 
       await fs.writeFile(filepath, html);
@@ -137,24 +122,4 @@ async function main() {
 
     const staticUrls = [
       BASE_URL + "index.html",
-      BASE_URL + "all-inclusive-resorts-worldwide.html",
-      BASE_URL + "religious-destinations-worldwide.html",
-      BASE_URL + "top-100-tourist-cities-hotels.html",
-      BASE_URL + "hostels-europe.html",
-    ];
-
-    const allUrls = [...staticUrls, ...pageUrls];
-
-    console.log("Building sitemap.xml with %d URLs", allUrls.length);
-    await buildSitemap(allUrls);
-
-    console.log("✅ ALL DONE.");
-    console.log("Open this to see real URLs:");
-    console.log("https://brightlane.github.io/booking.com/sitemap.xml");
-  } catch (err) {
-    console.error("generate-site-and-sitemap.js failed:", err.toString());
-    process.exit(1);
-  }
-}
-
-main();
+      BASE_URL + 
