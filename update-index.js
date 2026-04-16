@@ -1,4 +1,3 @@
-// update-index.js
 const fs = require('fs');
 const path = require('path');
 
@@ -22,8 +21,6 @@ OUT_DIRS.forEach(outDir => {
   files.forEach(file => {
     if (file.startsWith('hotels-in-') && file.endsWith('.html')) {
       const slug = file.replace(/\.html$/, '');
-
-      // 👇 Correct path for GitHub Pages
       const href = `/booking.com/${slug}.html`;
       links.push(`<li><a href="${href}">${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</a></li>`);
       sitemapUrls.push(`${HOST}/${slug}.html`);
@@ -31,7 +28,6 @@ OUT_DIRS.forEach(outDir => {
   });
 });
 
-// Build index.html (latest 1000 links)
 let indexContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -57,7 +53,6 @@ let indexContent = `
 
 fs.writeFileSync(INDEX_FILE, indexContent, 'utf8');
 
-// Build sitemap.xml
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${sitemapUrls.map(url => `
