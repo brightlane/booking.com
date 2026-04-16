@@ -1,0 +1,61 @@
+name: Generate pages daemon (auto‑restart)
+
+on:
+  workflow_dispatch:   # Manual trigger
+  workflow_call:       # Called by itself
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8198"
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install deps
+        run: |
+          npm install fs-extra chokidar
+
+      - name: Ensure output dir
+        run: |
+          mkdir -p output
+
+      - name: Run generate-pages-daemon for up to 6 hours
+        run: |
+          node generate-pages-daemon.js &
+          DAEMON_PID=$!
+          echo "Started daemon with PID $DAEMON_PID"
+          timeout 355m /bin/bash -c 'wait $DAEMON_PID || true'
+          sleep 10
+
+      - name: Update sitemap
+        run: |
+          if [ -f watch-sitemap.js ]; then
+            node watch-sitemap.js
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add output/ sitemap.xml
+          git commit -m "Autogenerate pages + sitemap (via long‑run daemon)" || echo "No changes"
+          git push origin main
+
+      # Re‑trigger the same workflow again (after current job finishes)
+      - name: Self‑trigger next run
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/generate-pages-daemon.yml/dispatches \
+            -d '{"ref":"main","inputs":{}}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
