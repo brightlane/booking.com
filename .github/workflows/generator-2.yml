@@ -1,19 +1,26 @@
-name: "Hotel Deals – Run Hotels (auto index)"
+name: Build and deploy GitHub Pages site
 
 on:
-  schedule:
-    - cron: "0 6 * * *"
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  generate_pages:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -21,21 +28,26 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
-        run: npm install node-fetch@2
+        run: npm install
 
-      - name: Run hotel generator (Stream 2)
-        run: node generator-loop-2.js
-
-      - name: Update index.html with new pages
-        run: node update-index.js
-
-      - name: Build site
+      - name: Run site builder
         run: node build-site.js
 
-      - name: Commit output and index.html
-        run: |
-          git config user.email "action@github.com"
-          git config user.name "GitHub Action"
-          git add -A .
-          git commit -m "Auto-gen hotels + build site: $(date)" || echo "No changes"
-          git push
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
