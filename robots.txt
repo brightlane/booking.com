@@ -1,0 +1,29 @@
+# robots.txt for brightlane/booking.com
+# Treat this as a massive but high‑quality affiliate site
+# All pages are indexed; sitemap provided
+
+User-agent: *
+Allow: /
+Disallow: /node_modules/
+Disallow: /.git/
+
+# Soft limit for crawling rate (be gentle)
+Crawl-delay: 10
+
+# Sitemap
+Sitemap: https://brightlane.github.io/booking.com/sitemap.xml
+
+# Allow major search engines to index everything
+Allow: /hotels-in-*
+Allow: /hotel-in-*
+Allow: /hotels-near-*
+Allow: /hotel-near-*
+
+# Block common junk patterns (if you ever add them)
+Disallow: /*?*
+Disallow: /cgi-bin/
+Disallow: /admin/
+
+# Human‑readable comment
+# All hotel pages are allowed; affiliate landing patterns are allowed.
+# Booking.com and Skyscanner affiliate links are preserved in every page.
