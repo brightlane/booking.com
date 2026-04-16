@@ -2,42 +2,36 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = __dirname;
-const OUT_DIRS = [
-  path.join(ROOT, 'output'),
-  path.join(ROOT, 'output-2'),
-];
+const SOURCES = [path.join(ROOT, 'output'), path.join(ROOT, 'output-2')];
 
-function readHtmlFiles(dir) {
-  if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir)
-    .filter(f => f.endsWith('.html') && f.startsWith('hotels-in-'))
-    .map(f => ({
-      name: f,
-      src: path.join(dir, f),
-      dest: path.join(ROOT, f),
-    }));
+function collectArticles() {
+  const items = [];
+  for (const dir of SOURCES) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of fs.readdirSync(dir)) {
+      if (file.startsWith('hotels-in-') && file.endsWith('.html')) {
+        items.push({ file, src: path.join(dir, file) });
+      }
+    }
+  }
+  return items;
 }
 
-function copyArticles() {
-  const files = OUT_DIRS.flatMap(readHtmlFiles);
-  files.forEach(file => {
-    fs.copyFileSync(file.src, file.dest);
-    console.log(`Copied ${file.name}`);
-  });
-  return files;
+function copyArticles(items) {
+  for (const item of items) {
+    fs.copyFileSync(item.src, path.join(ROOT, item.file));
+  }
 }
 
-function buildIndex(files) {
-  const items = files
-    .map(f => {
-      const label = f.name
-        .replace(/^hotels-in-/, '')
-        .replace(/\.html$/, '')
-        .replace(/-/g, ' ')
-        .replace(/\b\w/g, c => c.toUpperCase());
-      return `<li><a href="./${f.name}">${label}</a></li>`;
-    })
-    .join('\n');
+function writeIndex(items) {
+  const links = items.map(item => {
+    const label = item.file
+      .replace(/^hotels-in-/, '')
+      .replace(/\.html$/, '')
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase());
+    return `<li><a href="./${item.file}">${label}</a></li>`;
+  }).join('\n');
 
   const html = `<!doctype html>
 <html lang="en">
@@ -48,51 +42,45 @@ function buildIndex(files) {
   <meta name="description" content="Hotel articles and destination pages." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://brightlane.github.io/booking.com/" />
-  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <main class="container">
+  <main style="max-width:900px;margin:4rem auto;padding:1rem;">
     <h1>Hotel Deals.</h1>
-    <p>Choose an article below.</p>
     <ul>
-      ${items}
+      ${links}
     </ul>
   </main>
 </body>
 </html>`;
 
   fs.writeFileSync(path.join(ROOT, 'index.html'), html, 'utf8');
-  console.log('Wrote index.html');
 }
 
-function buildNoJekyll() {
+function ensureNoJekyll() {
   fs.writeFileSync(path.join(ROOT, '.nojekyll'), '', 'utf8');
-  console.log('Wrote .nojekyll');
 }
 
-function build404() {
+function write404() {
   const html = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Redirecting...</title>
   <meta http-equiv="refresh" content="0; url=https://brightlane.github.io/booking.com/" />
-  <script>
-    window.location.replace('https://brightlane.github.io/booking.com/');
-  </script>
+  <script>window.location.replace('https://brightlane.github.io/booking.com/');</script>
+  <title>Redirecting</title>
 </head>
 <body>
   <p>Redirecting to <a href="https://brightlane.github.io/booking.com/">Home</a>...</p>
 </body>
 </html>`;
   fs.writeFileSync(path.join(ROOT, '404.html'), html, 'utf8');
-  console.log('Wrote 404.html');
 }
 
-const copied = copyArticles();
-buildIndex(copied);
-buildNoJekyll();
-build404();
+const items = collectArticles();
+copyArticles(items);
+writeIndex(items);
+ensureNoJekyll();
+write404();
 
-console.log(`Done. ${copied.length} articles published to repo root.`);
+console.log(`Published ${items.length} article pages.`);
