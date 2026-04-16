@@ -62,6 +62,7 @@ function indexPage() {
     .btn{display:inline-block;margin-top:10px;background:#0b63f6;color:#fff;padding:10px 14px;border-radius:10px;font-weight:700}
     .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:20px}
     .links a{display:block;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;text-decoration:none;color:#111}
+    .note{margin-top:20px;color:#666;font-size:.95rem}
   </style>
 </head>
 <body>
@@ -81,37 +82,31 @@ function indexPage() {
         <p>Start with the main Booking.com search page.</p>
         <span class="btn">Check prices</span>
       </a>
-
       <a class="card" href="${BOOKING.APARTMENTS}" target="_blank" rel="nofollow sponsored noopener">
         <h2>Apartments</h2>
         <p>Find apartment stays for longer trips and families.</p>
         <span class="btn">Check prices</span>
       </a>
-
       <a class="card" href="${BOOKING.RESORTS}" target="_blank" rel="nofollow sponsored noopener">
         <h2>Resorts</h2>
         <p>Browse resort options with easy booking flow.</p>
         <span class="btn">Check prices</span>
       </a>
-
       <a class="card" href="${BOOKING.VILLAS}" target="_blank" rel="nofollow sponsored noopener">
         <h2>Villas</h2>
         <p>Explore private villa stays for group and luxury trips.</p>
         <span class="btn">Check prices</span>
       </a>
-
       <a class="card" href="${BOOKING.BNB}" target="_blank" rel="nofollow sponsored noopener">
         <h2>B&amp;B</h2>
         <p>Compare cozy bed and breakfast options.</p>
         <span class="btn">Check prices</span>
       </a>
-
       <a class="card" href="${BOOKING.GUESTHOUSES}" target="_blank" rel="nofollow sponsored noopener">
         <h2>Guesthouses</h2>
         <p>See guesthouse listings with simple pricing.</p>
         <span class="btn">Check prices</span>
       </a>
-
       <a class="card" href="${SKY}" target="_blank" rel="nofollow sponsored noopener">
         <h2>Flights with Skyscanner</h2>
         <p>Check flight deals before you finalize the trip.</p>
@@ -123,7 +118,7 @@ function indexPage() {
       ${pages.map(p => `<a href="${p.file}">${p.file.replace('.html','').replace(/-/g,' ')}</a>`).join('\n      ')}
     </div>
   </main>
-  <script src="affiliate-check-and-exit-pop.js"></script>
+  <script defer src="affiliate-check-and-exit-pop.js"></script>
 </body>
 </html>`;
 }
@@ -204,7 +199,7 @@ function cityPage(city, file) {
       ${pages.filter(p => p.file !== file).map(p => `<a href="${p.file}">${p.file.replace('.html','').replace(/-/g,' ')}</a>`).join('\n      ')}
     </div>
   </main>
-  <script src="affiliate-check-and-exit-pop.js"></script>
+  <script defer src="affiliate-check-and-exit-pop.js"></script>
 </body>
 </html>`;
 }
