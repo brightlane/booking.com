@@ -1,28 +1,48 @@
-name: Daily Generate 2000 Pages
+name: Generate pages daemon (limited time)
 
 on:
+  workflow_dispatch:       # Let you run manually
   schedule:
-    # Run every day at 02:00 UTC
-    - cron: "0 2 * * *"
-  workflow_dispatch:
+    - cron: "0 2 * * *"   # Or change as needed (UTC)
 
 jobs:
-  generate-pages:
+  generate:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          # This is needed so you can git push
+          token: ${{ secrets.PERSONAL_TOKEN }}
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: 18
 
-      - name: Install dependencies
+      - name: Install deps
         run: |
           npm install fs-extra
 
-      - name: Run one‑file generator
+      - name: Create output dir
+        run: mkdir -p output
+
+      - name: Run generate-pages-daemon for 10 minutes
         run: |
-          node one-file-everything.js
+          # Run daemon but kill after 10 minutes
+          node generate-pages-daemon.js &
+          sleep 600
+          pkill -f generate-pages-daemon.js
+
+      - name: Check what was generated
+        run: ls -la output/
+
+      - name: Commit and push
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add output/ sitemap.xml
+          git commit -m "Autogenerate pages + sitemap (via Actions)" || echo "No changes"
+          git push origin main
