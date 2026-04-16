@@ -8,6 +8,37 @@
 
 const fs = require("fs-extra");
 const path = require("path");
+
+// === Step 1: Load your affiliate definitions ===
+// Create affiliates.js with this content:
+//
+// exports.BOOKING = {
+//   HOME:        "https://www.booking.com/index.html?aid=8132800",
+//   APARTMENTS:  "https://www.booking.com/apartments/index.html?aid=8132800",
+//   RESORTS:     "https://www.booking.com/resorts/index.html?aid=8132800",
+//   VILLAS:      "https://www.booking.com/villas/index.html?aid=8132800",
+//   BNB:         "https://www.booking.com/bed-and-breakfast/index.html?aid=8132800",
+//   GUESTHOUSES: "https://www.booking.com/guest-house/index.html?aid=8132800",
+// };
+//
+// exports.SKY = {
+//   MAIN: "https://convert.ctypy.com/aff_c?offer_id=29465&aff_id=21885",
+// };
+//
+// exports.pickBooking = () => {
+//   const options = [
+//     exports.BOOKING.HOME,
+//     exports.BOOKING.APARTMENTS,
+//     exports.BOOKING.RESORTS,
+//     exports.BOOKING.VILLAS,
+//     exports.BOOKING.BNB,
+//     exports.BOOKING.GUESTHOUSES,
+//   ];
+//   return options[Math.floor(Math.random() * options.length)];
+// };
+//
+// exports.pickSky = () => exports.SKY.MAIN;
+
 const { BOOKING, SKY, pickBooking, pickSky } = require("./affiliates.js");
 
 const OUTPUT_DIR = path.resolve("./output");
@@ -65,9 +96,7 @@ function generateHotelPage(city, near, mod, lang = "en") {
   const in_city_str = nearStr ? `near ${nearStr}` : `in ${city}`;
 
   const slug = slugify(
-    `${base}-${city}-${nearStr}-${mod}-${Math.floor(
-      Math.random() * 999999
-    )}`
+    `${base}-${city}-${nearStr}-${mod}-${Math.floor(Math.random() * 999999)}`
   );
 
   const filename = `ht-${Math.floor(1000000 + Math.random() * 9000000)}-${slug}-${lang}.html`;
@@ -79,10 +108,10 @@ function generateHotelPage(city, near, mod, lang = "en") {
     `Find the best ${mod} ${base} ${in_city_str} in ${city} 2026 with deals and reviews. ` +
     `Use Booking.com and Skyscanner to book your stay and compare flights.`;
 
-  // Randomly pick one of your 6 Booking.com URLs
+  // Randomly pick one of your 6 Booking.com URLs (aid=8132800)
   const bookingUrl = pickBooking();
 
-  // Pick Skyscanner URL (you can add rotation later if you get more SKY IDs)
+  // Pick your Skyscanner URL (aff_id=21885 by default)
   const skyscannerUrl = pickSky();
 
   const hreflang = lang === "en"
