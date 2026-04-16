@@ -17,43 +17,35 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 2. Set up Node.js (v20, no cache = no lock file warning)
+      # 2. Set up Node.js (v20, no cache = no warnings)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      # 3. Install dependencies (optional but cleans up environment)
-      - name: Install dependencies
-        run: |
-          if [ -f "package.json" ]; then
-            npm ci
-          else
-            echo "No package.json; skipping install (this is fine for pure scripts)."
-          fi
-
-      # 4. Check if generate-site-files.js exists before running
+      # 3. Verify generate-site-files.js exists BEFORE running
       - name: Verify generate-site-files.js
         run: |
           if [ -f "generate-site-files.js" ]; then
             echo "✅ generate-site-files.js found in repo root."
           else
-            echo "❌ generate-site-files.js NOT FOUND. Please upload it to the root of the repo and push again."
+            echo "❌ ERROR: generate-site-files.js NOT FOUND in repo root."
+            echo "Please upload it directly to the root of the repo and push again."
             exit 1
           fi
 
-      # 5. Run the generator: 2000+ pages
+      # 4. Run the generator: 2000+ SEO hotel pages
       - name: Generate 2000+ hotel pages
         run: |
           node generate-site-files.js
 
-      # 6. Commit and push generated HTML files
+      # 5. Commit and push all generated HTML files
       - name: Commit and push changes
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
 
-          # Add all generated HTML files and the generator
+          # Add all generated .html files and the generator script
           git add ./*.html
           git add generate-site-files.js
 
