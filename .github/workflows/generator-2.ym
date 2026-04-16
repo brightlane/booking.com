@@ -2,7 +2,7 @@ name: "Hotel Deals – Auto‑Generator (Stream 2)"
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # run once per day at 06:00 UTC (different from your first one)
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 jobs:
