@@ -1,20 +1,81 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Hotel Deals. — New Pages</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://brightlane.github.io/booking.com/" />
-  <link rel="stylesheet" href="/styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotel Deals and Booking Guides</title>
+  <meta name="description" content="Save money and compare hotel deals with direct Booking.com landing pages.">
+  <style>
+    body{font-family:Arial,sans-serif;max-width:1100px;margin:0 auto;padding:24px;line-height:1.5;background:#f8fafc;color:#111}
+    h1{font-size:2.2rem;margin:0 0 8px}
+    .sub{color:#555;margin:0 0 18px}
+    .promo{background:#fff7d6;border:1px solid #f1d36b;border-radius:16px;padding:16px 18px;margin:18px 0 24px}
+    .promo strong{display:block;font-size:1.05rem;margin-bottom:6px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+    .card{display:block;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px;text-decoration:none;color:inherit;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:.15s}
+    .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .card h2{margin:0 0 8px;font-size:1.2rem}
+    .btn{display:inline-block;margin-top:10px;background:#0b63f6;color:#fff;padding:10px 14px;border-radius:10px;font-weight:700}
+    .section{margin-top:32px}
+    .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+    .links a{display:block;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;text-decoration:none;color:#111}
+    .footer{margin-top:28px;color:#666;font-size:.95rem}
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Hotel Deals.</h1>
-    <p>
-      All hotel pages are now accessible directly at
-      <code>/booking.com/hotels-in-*.html</code>.
-    </p>
-  </div>
+  <main>
+    <h1>Save money on hotel stays</h1>
+    <p class="sub">Click any headline to open a Booking.com deal page and compare live prices fast.</p>
+    <div class="promo">
+      <strong>Promo tip: compare before you book</strong>
+      Save money by checking live deals, looking for better room rates, and using the right landing page for your trip type.
+    </div>
+    <div class="grid">
+      <a class="card" href="https://www.booking.com/index.html?aid=1858279" target="_blank" rel="nofollow sponsored noopener">
+        <h2>Home page</h2>
+        <p>Start with the main Booking.com search page.</p>
+        <span class="btn">Check prices</span>
+      </a>
+      <a class="card" href="https://www.booking.com/apartments/index.html?aid=1858279" target="_blank" rel="nofollow sponsored noopener">
+        <h2>Apartments</h2>
+        <p>Find apartment stays for longer trips and families.</p>
+        <span class="btn">Check prices</span>
+      </a>
+      <a class="card" href="https://www.booking.com/resorts/index.html?aid=1858279" target="_blank" rel="nofollow sponsored noopener">
+        <h2>Resorts</h2>
+        <p>Browse resort options with easy booking flow.</p>
+        <span class="btn">Check prices</span>
+      </a>
+      <a class="card" href="https://www.booking.com/villas/index.html?aid=1858279" target="_blank" rel="nofollow sponsored noopener">
+        <h2>Villas</h2>
+        <p>Explore private villa stays for group and luxury trips.</p>
+        <span class="btn">Check prices</span>
+      </a>
+      <a class="card" href="https://www.booking.com/bed-and-breakfast/index.html?aid=1858279" target="_blank" rel="nofollow sponsored noopener">
+        <h2>B&amp;B</h2>
+        <p>Compare cozy bed and breakfast options.</p>
+        <span class="btn">Check prices</span>
+      </a>
+      <a class="card" href="https://www.booking.com/guest-house/index.html?aid=1858279" target="_blank" rel="nofollow sponsored noopener">
+        <h2>Guesthouses</h2>
+        <p>See guesthouse listings with simple pricing.</p>
+        <span class="btn">Check prices</span>
+      </a>
+    </div>
+    <div class="section">
+      <h2>Related hotel pages</h2>
+      <div class="links">
+        <a href="hotels-in-london.html">Hotels in London</a>
+        <a href="hotels-in-paris.html">Hotels in Paris</a>
+        <a href="hotels-in-rome.html">Hotels in Rome</a>
+        <a href="hotels-in-barcelona.html">Hotels in Barcelona</a>
+        <a href="hotels-in-madrid.html">Hotels in Madrid</a>
+        <a href="hotels-in-new-york-city.html">Hotels in New York City</a>
+        <a href="hotels-in-tokyo.html">Hotels in Tokyo</a>
+        <a href="hotels-in-singapore-singapore-00000004-2.html">Singapore hotel page</a>
+      </div>
+    </div>
+    <p class="footer">Internal pages use relative links so GitHub Pages keeps them working correctly, while all Booking.com links stay intact with your affiliate ID. [web:616][web:622]</p>
+  </main>
 </body>
 </html>
