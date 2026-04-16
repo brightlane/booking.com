@@ -2,7 +2,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const HOTEL_DIR = path.join(__dirname, 'hotels');
+const OUT_DIRS = [
+  path.join(__dirname, 'output'),
+  path.join(__dirname, 'output-2'),
+];
+
 const INDEX_FILE = path.join(__dirname, 'index.html');
 const SITEMAP_FILE = path.join(__dirname, 'sitemap.xml');
 
@@ -11,17 +15,21 @@ const HOST = 'https://brightlane.github.io/booking.com';
 let links = [];
 let sitemapUrls = [];
 
-if (fs.existsSync(HOTEL_DIR)) {
-  const files = fs.readdirSync(HOTEL_DIR);
+OUT_DIRS.forEach(outDir => {
+  if (!fs.existsSync(outDir)) return;
+
+  const files = fs.readdirSync(outDir);
   files.forEach(file => {
     if (file.startsWith('hotels-in-') && file.endsWith('.html')) {
       const slug = file.replace(/\.html$/, '');
-      const href = `/hotels/${slug}.html`;
+
+      // 👇 Correct path for GitHub Pages
+      const href = `/booking.com/${slug}.html`;
       links.push(`<li><a href="${href}">${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</a></li>`);
-      sitemapUrls.push(`${HOST}${href}`);
+      sitemapUrls.push(`${HOST}/${slug}.html`);
     }
   });
-}
+});
 
 // Build index.html (latest 1000 links)
 let indexContent = `
@@ -63,4 +71,4 @@ ${sitemapUrls.map(url => `
 
 fs.writeFileSync(SITEMAP_FILE, sitemap, 'utf8');
 
-console.log(`✅ Updated index.html (latest 1000) and sitemap.xml (${sitemapUrls.length} URLs).`);
+console.log(`✅ Updated index.html (latest 1000 links) and sitemap.xml (${sitemapUrls.length} URLs).`);
