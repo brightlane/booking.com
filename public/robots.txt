@@ -1,0 +1,18 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Block private or non-SEO pages (optional)
+Disallow: /api/
+Disallow: /admin/
+Disallow: /scripts/
+Disallow: /data/
+
+# Prevent indexing of query spam pages (optional safety)
+Disallow: /*?*
+
+# Sitemap (IMPORTANT - replace with your real domain)
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Crawl delay (optional, usually ignored by Google but useful for others)
+Crawl-delay: 1
