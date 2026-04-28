@@ -5,8 +5,8 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 0 * * *'  # Runs every night at midnight
-  workflow_dispatch:      # Manual trigger for testing
+    - cron: '0 0 * * *'  # Midnight daily execution
+  workflow_dispatch:      # Manual "Run" button
 
 jobs:
   build-and-deploy:
@@ -19,31 +19,31 @@ jobs:
       - name: 🛰️ Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Full history needed for large-scale rebasing
+          fetch-depth: 0
 
-      - name: 🐍 Set up Python 3.9
+      - name: 🐍 Setup Python 3.9
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
-      - name: 📦 Install Dependencies
+      - name: 📦 Install Requirements
         run: |
           python -m pip install --upgrade pip
           pip install requests tweepy
 
-      - name: 🛠️ Execute Vulture 10K Engine
+      - name: 🛠️ Run Vulture Page Generator
         run: python scripts/vulture_gen.py
 
-      - name: 📝 Execute Chameleon Blog Stitcher
+      - name: 📝 Run Chameleon Content Stitcher
         run: python scripts/vulture_stitcher.py
 
-      - name: 📅 Generate Daily Protocol Update
+      - name: 📅 Run Daily Update Protocol
         run: python scripts/daily_blog.py
 
       - name: 🗺️ Refresh Global Sitemap
         run: python scripts/generate_sitemap.py
 
-      - name: 📡 Broadcast to AI Ecosystems
+      - name: 📡 AI Ecosystem Broadcast
         env:
           AYRSHARE_API_KEY: ${{ secrets.AYRSHARE_API_KEY }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
@@ -52,25 +52,20 @@ jobs:
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
         run: python scripts/ai_broadcaster.py
 
-      - name: 🚀 High-Volume Sync and Push
+      - name: 🚀 Sync and Force-Deploy Updates
         run: |
           git config --global user.name "Nexus-Stack-Bot"
           git config --global user.email "bot@nexusstack.io"
           
-          # Stage all new generated content
+          # Stage all generated content (10,000+ files)
           git add .
           
-          # Check for changes - if nothing new, exit gracefully
-          if git diff --staged --quiet; then
-            echo "No new content generated today."
-            exit 0
-          fi
-
-          # Commit with timestamp
-          git commit -m "Vulture 10K Refresh: $(date +'%Y-%m-%d %H:%M')"
+          # Commit changes - exit gracefully if no new content
+          git commit -m "Vulture 10K Refresh: $(date +'%Y-%m-%d %H:%M')" || exit 0
           
-          # Pull latest changes and force "Bot Wins" strategy for conflicts
+          # Force resolution: The Bot's new content always "Wins" conflicts
+          # This handles any edits you made in the browser during the run
           git pull origin main --rebase -X ours
           
-          # Push to main
+          # Final push to the live repository
           git push origin main
